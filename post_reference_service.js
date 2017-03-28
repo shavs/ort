@@ -37,29 +37,40 @@ var Server = https.createServer(options, function (request , response) {
     //var post_request = qs.parse(body);
     var post_request = JSON.parse(body);
     console.dir(post_request, {depth: null, colors: true});
-    
+
+
+    // Current issue - currently, I have no method of incrementing an ID
+    post_request['_id'] = 123465;
     console.log("Attempting to connect to Mongo...");
 
-    MongoClient.connect('mongodb://127.0.0.1:27017', function(error, database) {
+    MongoClient.connect('mongodb://127.0.0.1:27017/test', function(error, database) {
       if (!error) {
         // Test if the username meets the regex requirement
         if (!post_request.dbname || !post_request.user_id || !post_request.folder_name) {
           console.log("invalid - some crucial fields were left blank.");
+          // Return unsuccessful headers
+          
         } else {
           // Query the MongoDB server, check if the User ID exists already
-          if (!search.user_id || post_request.user_id !== search.user_id) {
-            console.log('User ID does not match.');
-
-            // Return Unauthorised.
-          } else {
-            // User ID matches, next
+          var query_user_id = database.collection('db_test_name');
+          query_user_id.find({'user_id' : post_request.user_id}).toArray(function(error,results){
+            var number_of_results = 0;
+            for (i = 0; i < results.length; i++) {
+              number_of_results++;
+            }
+            if (number_of_results > 0) {
+              console.log("There are", number_of_results, "results that have the same User ID as the POST information.");
+            }
+          });
           }
-        }
+          
         
-        
-        var test = database.collection('dbname');
-        test.insert({author: post_request.author, title:post_request.title, date_accessed: post_request.date_accessed, date_published:post_request.date_published }, function (error, results) {
+        console.log(post_request);
+        var test = database.collection('db_test_name');
+        test.insert(post_request, function (error, results) {
+        //test.insert({author: post_request.author, title:post_request.title, date_accessed: post_request.date_accessed, date_published:post_request.date_published }, function (error, results) {
           if(!error) {
+          //console.log(results);
             console.log("added the requested information");
             // Validate by finding the information within Mongo and displaying to the user
           } else {
