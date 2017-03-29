@@ -40,10 +40,11 @@ var Server = https.createServer(options, function (request , response) {
       console.dir(post_request, {depth: null, colors: true});
 
 
-      // Current issue - currently, I have no method of incrementing an ID
+      // Current issue - currently, I have no method of incrementing an ID (yet)
       post_request['_id'] = 123474;
-      console.log("Attempting to connect to Mongo...");
 
+      
+      console.log("Attempting to connect to Mongo...");
       MongoClient.connect('mongodb://127.0.0.1:27017/test', function(error, database) {
         if (!error) {
           // Test if the username meets the regex requirement
@@ -72,6 +73,7 @@ var Server = https.createServer(options, function (request , response) {
                 console.log("There are", number_of_results, "results that have the same User ID as the POST information.");
                 // Update the current DB record
 
+                console.log('Updating the current record in the database');
                 var collection = database.collection('db_test_name');
                 // Update the number of records in the database
               } else if (number_of_results === 0 && matching_folder === 0) {
