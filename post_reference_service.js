@@ -76,6 +76,20 @@ var Server = https.createServer(options, function (request , response) {
                 console.log('Updating the current record in the database');
                 var collection = database.collection('db_test_name');
                 // Update the number of records in the database
+
+                //1. Find the _id of the record
+                //2. Delete the record that exists at _id
+                //3. Insert the new record with same _id as the old one
+                //4. Return HTTP status code
+                
+                // Using Mongo cli, check if the record has been updated
+                // to ensure working code
+
+                // Because .update will only update a single value, whereas
+                // it would be difficult to check against every single property
+                // especially as a JSON object could be hundreds of records long
+                // it would be too labour-intensive.
+
               } else if (number_of_results === 0 && matching_folder === 0) {
                 console.log('Insert the new record into the database');
                 var collection = database.collection('db_test_name');
