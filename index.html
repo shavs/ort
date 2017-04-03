@@ -44,10 +44,10 @@
   <button id="send_button">Submit</button>
 
   <p>GET Request of the document</p>
-  <form id="get_request_test" action="https://localhost:8080/" method="get">
+  <form id="get_request_test" method="get">
     <input type="text" name="user_id" value="1234-1234-1234-1234" id="" />
     <input type="text" name="folder_name" value="Reference_Test" id="" />
-    <button id="get_button">Submit GET request</button>
+    <button id="get_button" type="button" >Submit GET request</button>
   </form>
   
   <p>GET request results</p>
@@ -97,7 +97,9 @@
       var core_data = new FormData(document.getElementById('core_information'));
 
       var jsonToPost = {
-        _id:"",
+        // The ID does not get POSTed, this is because the server-side
+        // will handle adding an ID to the references
+        // MonogoDB, by default, will use ObjectID as the example
         user_id : core_data.get('user_id'),
         dbname : core_data.get('dbname'),
         folder_name : core_data.get('folder_name'),
@@ -126,7 +128,7 @@
       // Now that the JSON has been created, POST it to the server side
 
       // mode:cors allows Cross Origin requests
-      var request = new Request('https://localhost:8080',{
+      var request = new Request('https://localhost:8080/api/save_references',{
         method: 'POST',
         mode: 'cors',
         redirect:'follow',
@@ -153,7 +155,6 @@
       var core_data = new FormData(document.getElementById('core_information'));
 
       var jsonToPost = {
-        _id:"",
         user_id : core_data.get('user_id'),
         dbname : core_data.get('dbname'),
         folder_name : core_data.get('folder_name'),
@@ -193,27 +194,47 @@
 
     // GET requests
     document.getElementById('get_button').addEventListener('click', function () {
-      var get_information = new FormData(document.getElementById('core_information'));
-      //var dataToGet = {
-        //user_id : get_information.get('user_id'),
-        //dbname : get_information.get('dbname'),
-        //folder_name : get_information.get('folder_name')
-      //}
+      //var get_information = new FormData(document.getElementById('core_information'));
 
 
       // Send the data to the server using fetch
-      var request = new Request('https://localhost:8080?user_id=' + get_information.get('user_id') + '&dbname=' + get_information.get('dbname') + "",{
-        method: 'GET',
-        mode: 'cors',
-        redirect:'follow',
-        headers: new Headers({'Content-Type':'text/plain'})
-      });
+      //var get_url = "https://localhost:8080/api/get_references?user_id=" + get_information.get('user_id') + "&dbname=" + get_information.get("dbname") + "";
+      //console.log(get_url);
+      
+      //var request = new Request(get_url,{
+        //method: 'GET',
+        //mode: 'cors',
+        //redirect:'error',
+        //headers: new Headers({'Content-Type':'text/plain'})
+      //});
 
-      fetch(request).then(function (response) {
-        console.log('Response below:');
-        console.log(response);
-      });
+      //console.log(request);
 
+      //fetch(request).then(function (response) {
+        //console.log('Response below:');
+        //console.log(response);
+        //response.preventDefault();
+      //});
+
+
+      // XHR
+        //var xhr_b = new XMLHttpRequest();
+        //xhr_b.addEventListener('load', function (e) {
+          //console.log(e.target.responseText);
+        //});
+        //xhr_b.open('GET', 'https://localhost:8080/api/get_references?user_id=' + get_information.get('user_id') + '&dbname=' + get_information.get('dbname') + '' );
+        //xhr_b.send(); 
+
+
+      // 2nd Fetch Request
+      fetch("https://localhost:8080/api/get_references?user_id=1234-1234-1234-1234&folder_name=Reference_Test").then(function(response){
+        console.log('Response returned by the server: ', response);
+        var returned_json = function (response) {
+          return response.json();
+        }
+      }).then(function(json){
+        console.log(json);
+      });
     });
     
   </script>
