@@ -35,6 +35,8 @@ var options = {
 // Requires for the API functionality
 var save_references = require('./save_references.js');
 var get_references = require('./get_references.js');
+var get_user_id = require("./get_user_id.js");
+
 
 // Global Response code - by default, the response code will always be 200.
 // It will only change if there is any different result (e.g. errors)
@@ -49,12 +51,20 @@ var Server = https.createServer(options, function (request , response) {
 
   if (url_data.pathname === '/api/get_references') {
     console.log('[MAIN] Get References requested: ', url_data.pathname);
-    // Get References from a URL.
+    // Get References
     get_references(request, response);
   } else if (url_data.pathname === '/api/save_references') {
     console.log('[MAIN] Save References requested: ', url_data.pathname);
-    // Save references to a URL
+    // Save references
     save_references(request, response);
+  } else if (url_data.pathname === "/api/delete_references"){
+    console.log("[MAIN] Delete Folder requested: ", url_data.pathname);
+    // Delete references
+    //delete_references(request, response);
+  } else if (url_data.pathname === "/api/get_user_id") {
+    console.log("[MAIN] Get User ID requested: ", url_data.pathname);
+    // Request a user ID
+    get_user_id(request, response);
   } else if (url_data.pathname === '/' || url_data.pathname === "/index.html"){
     console.log('[MAIN] Home Page requested.');
     // Send the client the home page, by reading the index.html page,
@@ -75,18 +85,7 @@ var Server = https.createServer(options, function (request , response) {
     });
   } else {
     console.log("[MAIN] It's a request we aren't looking for - let it pass through.");
-    // Read out a 404 page, return this to the client along with a custom 404
-    // page for the end user.
   }
-  
-  //if (request.method === "POST") {
-    //// Do nothing - the URL parsing should be taking effect right now.
-  //} else if (request.method === "GET") {
-  //} else {
-    //// Unknown request - defaults to 400 - Forbidden
-    //response.writeHeader("400", {"Access-control-allow-origin" : "*", "Content-Type" : "text/plain"});
-    //response.end("" + responseCode + "");
-  //}
 });
 
 Server.listen(PORT, IP_ADDR, function () {

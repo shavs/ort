@@ -75,7 +75,6 @@ function get_references (request, response) {
   //generateResponse(responseCode = "404", response);
 }
 
-
 function generateResponse (responseCode = "404", response, get_return_payload) {
   console.log("Response code generated:", responseCode);
   console.log(get_return_payload);
@@ -83,8 +82,9 @@ function generateResponse (responseCode = "404", response, get_return_payload) {
     response.writeHeader(responseCode, {"Access-control-allow-origin" : "*", "Content-Type" : "text/plain"});
     response.end("" + responseCode + "");
   } else {
-    response.writeHeader(responseCode, {"Access-control-allow-origin" : "*", "Content-Type" : "text/json"});
-    response.end("" + get_return_payload + "");
+    response.writeHeader(responseCode, {"Access-control-allow-origin" : "*", "Content-Type" : "application/json"});
+    //response.json(get_return_payload);
+    response.end(get_return_payload);
   }
 }
 

@@ -194,12 +194,12 @@
 
     // GET requests
     document.getElementById('get_button').addEventListener('click', function () {
-      //var get_information = new FormData(document.getElementById('core_information'));
+      var get_information = new FormData(document.getElementById('core_information'));
 
 
       // Send the data to the server using fetch
-      //var get_url = "https://localhost:8080/api/get_references?user_id=" + get_information.get('user_id') + "&dbname=" + get_information.get("dbname") + "";
-      //console.log(get_url);
+      var get_url = "https://localhost:8080/api/get_references?user_id=" + get_information.get("user_id") + "&folder_name=" + get_information.get("folder_name") + "";
+      console.log(get_url);
       
       //var request = new Request(get_url,{
         //method: 'GET',
@@ -215,25 +215,13 @@
         //console.log(response);
         //response.preventDefault();
       //});
-
-
-      // XHR
-        //var xhr_b = new XMLHttpRequest();
-        //xhr_b.addEventListener('load', function (e) {
-          //console.log(e.target.responseText);
-        //});
-        //xhr_b.open('GET', 'https://localhost:8080/api/get_references?user_id=' + get_information.get('user_id') + '&dbname=' + get_information.get('dbname') + '' );
-        //xhr_b.send(); 
-
-
-      // 2nd Fetch Request
-      fetch("https://localhost:8080/api/get_references?user_id=1234-1234-1234-1234&folder_name=Reference_Test").then(function(response){
-        console.log('Response returned by the server: ', response);
-        var returned_json = function (response) {
-          return response.json();
-        }
-      }).then(function(json){
-        console.log(json);
+      
+      fetch(get_url).then(
+        function (response) {
+        return response.json();
+      }).then(function(data){
+        console.log(data);
+        document.getElementById("get_results").value = JSON.stringify(data);
       });
     });
     

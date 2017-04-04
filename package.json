@@ -1,0 +1,11 @@
+{
+  "name": "ort",
+  "version": "1.0.0",
+  "devDependencies": {
+    "babel-cli": "^6.0.0",
+    "uuid" : "^3.0.1"
+  },
+  "dependencies": {
+  }
+}
+
