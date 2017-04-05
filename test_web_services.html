@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>POST test for Node.JS server</title>
+</head>
+<body>
+  <p>First Reference</p>
+  <!-- Type of Reference Selector -->
+  <select name="type" form="test_form">
+    <option value="webpage">Webpage</option>
+    <option value="tv_broadcast">TV Broadcast</option>
+  </select>
+  <!-- Form for main input -->
+  <form id="test_form">
+    <input type="text" name="author" value="Sergey Brin" id="" />
+    <input type="text" name="title" value="Google, Inc." id="" />
+    <input type="text" name="url" value="http://google.com" id="" />
+    <input type="date" name="date_accessed" value="" id="" placeholder="Date Accessed"/>
+    <input type="date" name="date_published" value="" id="" placeholder="Date Published"/>
+  </form>
+
+  <p>Second Reference</p>
+  <select name="type" form="test_form_two">
+    <option value="webpage">Webpage</option>
+    <option value="tv_broadcast">TV Broadcast</option>
+  </select>
+  
+  <form id="test_form_two">
+    <input type="text" name="author" value="Sergey Brin" id="" />
+    <input type="text" name="title" value="Google, Inc." id="" />
+    <input type="text" name="url" value="http://google.com" id="" />
+    <input type="date" name="date_accessed" value="" id="" placeholder="Date Accessed"/>
+    <input type="date" name="date_published" value="" id="" placeholder="Date Published"/>
+  </form>
+
+  <p>Core Information</p>
+  <form id="core_information">
+    <input type="text" name="dbname" value="dbname" />
+    <input type="text" name="user_id" value="1234-1234-1234-1234" id="" />
+    <input type="text" name="folder_name" value="Reference_Test" id="" />
+  </form>
+  
+  <button id="send_button">Submit</button>
+
+  <p>GET Request of the document</p>
+  <form id="get_request_test" method="get">
+    <input type="text" name="user_id" value="1234-1234-1234-1234" id="" />
+    <input type="text" name="folder_name" value="Reference_Test" id="" />
+    <button id="get_button" type="button" >Submit GET request</button>
+  </form>
+  
+  <p>GET request results</p>
+  <textarea name="get_results" cols="50" rows="10" id="get_results" ></textarea>
+
+  <p>POST AJAX test button</p>
+  <button id="post_ajax_button">Click to Test, will log results into the console</button>
+
+  <script type="text/javascript">
+    // Script to take form data, and create JSON from it
+
+    // Here, we are going to make the JSON constructor
+    function getFormData (form) {
+      var form_data = new FormData(form);
+
+      this.type = form_data.get('type');
+      // Next, for each type of reference
+      if (form_data.get('type') === 'webpage') {
+        // Website
+        // Required: Author(s), Date Accessed,
+        // Date Published, URL, Title of Site
+        this.author = form_data.get('author');
+        this.date_accessed = form_data.get('date_accessed');
+        this.date_published = form_data.get('date_published');
+        this.title = form_data.get('title');
+        this.URL = form_data.get('url');
+        
+      } else if (form_data.get('type') === 'tv_broadcast'){
+        // TV Broadcast
+        // Required: Date Published, Channel,
+        // title, time (24h), month and day broadcasted
+      } else {
+        // return error
+      };
+    }
+    
+    // This function should collect the form data, append it as a JSON object,
+    // and then POST that data to the server side.
+    document.getElementById('send_button').addEventListener('click', function(){
+      var form = document.getElementById("test_form");
+      var form2 = document.getElementById("test_form_two");
+
+      var json_obj = new getFormData(form);
+      var json_obj_two = new getFormData(form2);
+
+      // Got the form data, now we need to construct the JSON
+      var core_data = new FormData(document.getElementById('core_information'));
+
+      var jsonToPost = {
+        // The ID does not get POSTed, this is because the server-side
+        // will handle adding an ID to the references
+        // MonogoDB, by default, will use ObjectID as the example
+        user_id : core_data.get('user_id'),
+        dbname : core_data.get('dbname'),
+        folder_name : core_data.get('folder_name'),
+        references : [
+        {
+          type : json_obj.type,
+          author : json_obj.author,
+          date_accessed : json_obj.date_accessed,
+          date_published : json_obj.date_published,
+          title : json_obj.title,
+          URL : json_obj.URL
+        },
+        {
+          type : json_obj_two.type,
+          author : json_obj_two.author,
+          date_accessed : json_obj_two.date_accessed,
+          date_published : json_obj_two.date_published,
+          title : json_obj_two.title,
+          URL : json_obj_two.URL
+        }
+        ]
+      }
+      console.log(jsonToPost);
+      console.log(JSON.stringify(jsonToPost));
+
+      // Now that the JSON has been created, POST it to the server side
+
+      // mode:cors allows Cross Origin requests
+      var request = new Request('https://localhost:8080/api/save_references',{
+        method: 'POST',
+        mode: 'cors',
+        redirect:'follow',
+        headers: new Headers({'Content-Type':'text/plain'}),
+        body: JSON.stringify(jsonToPost)
+      });
+
+      fetch(request).then(function (response) {
+        console.log('Response below:');
+        console.log(response);
+      });
+      
+    });
+
+    document.getElementById('post_ajax_button').addEventListener('click', function () {
+      // Test POST request using AJAX instead of Fetch to make the POST request.
+      var form = document.getElementById("test_form");
+      var form2 = document.getElementById("test_form_two");
+
+      var json_obj = new getFormData(form);
+      var json_obj_two = new getFormData(form2);
+
+      // Got the form data, now we need to construct the JSON
+      var core_data = new FormData(document.getElementById('core_information'));
+
+      var jsonToPost = {
+        user_id : core_data.get('user_id'),
+        dbname : core_data.get('dbname'),
+        folder_name : core_data.get('folder_name'),
+        references : [
+        {
+          type : json_obj.type,
+          author : json_obj.author,
+          date_accessed : json_obj.date_accessed,
+          date_published : json_obj.date_published,
+          title : json_obj.title,
+          URL : json_obj.URL
+        },
+        {
+          type : json_obj_two.type,
+          author : json_obj_two.author,
+          date_accessed : json_obj_two.date_accessed,
+          date_published : json_obj_two.date_published,
+          title : json_obj_two.title,
+          URL : json_obj_two.URL
+        }
+        ]
+      }
+      console.log(jsonToPost);
+      console.log(JSON.stringify(jsonToPost));
+
+      // Now that we have the JSON, time to POST using AJAX and to see the response
+      var xhr_c = new XMLHttpRequest();
+
+      xhr_c.addEventListener('load', function (e){
+        console.log('Response code below!');
+        console.log(e.target.status);
+      });
+      xhr_c.open('POST', 'https://localhost:8080', true);
+      xhr_c.send(JSON.stringify(jsonToPost));
+    });
+
+
+    // GET requests
+    document.getElementById('get_button').addEventListener('click', function () {
+      var get_information = new FormData(document.getElementById('core_information'));
+
+
+      // Send the data to the server using fetch
+      var get_url = "https://localhost:8080/api/get_references?user_id=" + get_information.get("user_id") + "&folder_name=" + get_information.get("folder_name") + "";
+      console.log(get_url);
+      
+      //var request = new Request(get_url,{
+        //method: 'GET',
+        //mode: 'cors',
+        //redirect:'error',
+        //headers: new Headers({'Content-Type':'text/plain'})
+      //});
+
+      //console.log(request);
+
+      //fetch(request).then(function (response) {
+        //console.log('Response below:');
+        //console.log(response);
+        //response.preventDefault();
+      //});
+      
+      fetch(get_url).then(
+        function (response) {
+        return response.json();
+      }).then(function(data){
+        console.log(data);
+        document.getElementById("get_results").value = JSON.stringify(data);
+      });
+    });
+    
+  </script>
+</body>
+</html>

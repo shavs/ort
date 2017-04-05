@@ -28,16 +28,16 @@ function save_references (request, response) {
       // and after a variable.
 
       console.log('  [SAVE_REFERENCES] Trimming whitespace');
-      post_request.dbname = post_request.dbname.trim();
+      //post_request.dbname = post_request.dbname.trim();
       post_request.user_id = post_request.user_id.trim();
       post_request.folder_name = post_request.folder_name.trim();
-      console.log('  [SAVE_REFERENCES] Trimmed whitespace output:', post_request.dbname, "\n", post_request.user_id, "\n", post_request.folder_name);
+      console.log('  [SAVE_REFERENCES] Trimmed whitespace output:', "\n  ", post_request.user_id, "\n  ", post_request.folder_name);
       
       console.log("  [SAVE_REFERENCES] Attempting to connect to MongoDB.");
       MongoClient.connect("mongodb://127.0.0.1:27017/test", function(error, database) {
         if (!error) {
           // Test if the username meets the requirement
-          if (!post_request.dbname || !post_request.user_id || !post_request.folder_name) {
+          if (!post_request.user_id || !post_request.folder_name) {
             console.log("  [SAVE_REFERENCES] Invalid - crucial fields were left blank.");
             // Return unsuccessful headers
             generateResponse(400, response);
@@ -77,12 +77,12 @@ function save_references (request, response) {
                     }
                   }
                   // Print out the result of the check to the console
-                  console.log('  [SAVE_REFERENCES]');
-                  console.log("Results of check:");
-                  console.log("Number of results:", number_of_results);
-                  console.log("Number of folders:", matching_folder);
-                  console.log("Folder IDs Collected: " + matching_folder_id + "");
-                  console.log("Is there a matching folder ID? (matches the array number in the array above): " +  matching_folder_id_true);
+                  console.log("  [SAVE_REFERENCES]");
+                  console.log("  Results of check:");
+                  console.log("  Number of results:", number_of_results);
+                  console.log("  Number of folders:", matching_folder);
+                  console.log("  Folder IDs Collected: " + matching_folder_id + "");
+                  console.log("  Is there a matching folder ID? (matches the array number in the array above): " +  matching_folder_id_true);
     
                   // If the User ID exists and there is a matching folder name
                   if (number_of_results >= 1 && matching_folder === 1) {
@@ -173,3 +173,8 @@ function generateResponse (responseCode = "404", response) {
 // This allows the main function of the script to be "exportable", usable in
 // other scripts.
 module.exports = save_references;
+
+
+// Examples of MongoDB functionality using Node Driver
+// http://doduck.com/node-js-mongodb-hello-world-example/
+// http://stackoverflow.com/a/20699980

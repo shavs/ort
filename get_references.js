@@ -28,7 +28,7 @@ function get_references (request, response) {
     // No error, checking the User ID
     if (!get_request.user_id && !get_request.folder_name) {
       // There was an error opening the MongoDB connection
-      console.log("Error - core information missing.");
+      console.log("  [GET_REFERENCES] Error - core information missing.");
       console.log(error);
       generateResponse(500, response);
     } else {
@@ -48,23 +48,23 @@ function get_references (request, response) {
           get_return_payload = JSON.stringify(results[0]);
           // Attach payload to write to the response obj
           
-          console.log("Right Result");
+          console.log("  [GET_REFERENCES] Right Result");
           generateResponse(200, response, get_return_payload);
         } else if (number_of_results > 1 && matching_folder_name_id.length > 1) {
           // There is more than one - worry
-          console.log("Wrong Result - more than one result, and the length of the ID array is longer than 1");
+          console.log("  [GET_REFERENCES] Wrong Result - more than one result, and the length of the ID array is longer than 1");
           generateResponse(400, response);
         } else {
           // If there is nothing to get, just set the header
           // variable and leave it at that.
-          console.log("Very Wrong Result");
+          console.log("  [GET_REFERENCES] Very Wrong Result");
           generateResponse(400, response);
         }
       });
     }
   } else {
     // There was an error during the GET request
-    console.log("Error - Get Request");
+    console.log("  [GET_REFERENCES] Error - Get Request");
     console.log(get_request.user_id);
     generateResponse(400, response);
    }
@@ -76,7 +76,7 @@ function get_references (request, response) {
 }
 
 function generateResponse (responseCode = "404", response, get_return_payload) {
-  console.log("Response code generated:", responseCode);
+  console.log("  [GET_REFERENCES] Response code generated:", responseCode);
   console.log(get_return_payload);
   if (!get_return_payload) {
     response.writeHeader(responseCode, {"Access-control-allow-origin" : "*", "Content-Type" : "text/plain"});
