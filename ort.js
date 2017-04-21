@@ -63,7 +63,7 @@ function post_information (url = SERVER_URL, json = "") {
 // IDB function to get all folder names available and return an array object
 // Accepts an empty array to insert information into
 function get_folder_names (array, _callback) {
-  var request = indexedDB.open("folder_database", 1);
+  var request = indexedDB.open("folder_database", 2);
 
   request.onupgradeneeded = function () {
     var database = request.result;
@@ -161,7 +161,13 @@ function folder_names_list_operation (array = "", operation = "", _callback) {
 // Not checking type for now, as it has not been implemented within
 // other functionality
 function create_reference (json, type, _callback) {
-  var request = indexedDB.open("folder_database", 1);
+  var request = indexedDB.open("folder_database", 2);
+
+  request.onupgradeneeded = function () {
+    var database = request.result;
+    var store = database.createObjectStore("TextStore", {keyPath:"id", autoIncrement: true});
+    var index = store.createIndex("SearchIndex", ["id"]);
+  };
 
   request.onsuccess = function () {
     // Get the DB

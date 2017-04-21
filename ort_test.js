@@ -6,7 +6,7 @@ function getfolder (folder_name) {
   // first, make a call to the GET request function
   var result = "";
   // Fetch the information
-  fetch("https://localhost:8080/api/get_references?user_id=35640b42-b1b5-4622-ba35-406ea52540b8&folder_name=New_folder").then(function(response){
+  fetch("https://localhost:8080/api/get_references?user_id=8e1866c6-4128-4656-96c3-3b96615dc18f&folder_name=New_folder").then(function(response){
       //console.log("[ORT.JS] Response Received for " + url + ", converting to JSON...");
       return response.json();
     }).then(function(data){
@@ -24,7 +24,7 @@ function getfolder (folder_name) {
         var array = [];
         console.log("[TESTSCRIPT] Called Back! Getting the folder names");
         get_folder_names(array, function (new_array){
-        console.log('[TESTSCRIPT] Called Back! Clearing the foldern names');
+        console.log('[TESTSCRIPT] Called Back! Clearing the folder names');
         console.log("[TESTSCRIPT] New Array contains:", new_array, new_array.length);
         folder_names_list_operation(new_array, "clear", function () {
           console.log('[TESTSCRIPT] Called back! Generating Folder names now.');
@@ -41,10 +41,6 @@ function getfolder (folder_name) {
     }).catch(function(error){
       console.log("[TESTSCRIPT] Error! Something went wrong:", error);
     });
-
-    console.log("[TESTSCRIPT] Remove test data from IDB.");
-
-    
 }
 
 getfolder("New_folder");

@@ -18,8 +18,8 @@ fetch("https://localhost:8080/api/get_user_id").then(function(response){
 // Used for deleting a folder
 // Fill out the User ID and the folder name in order to test
 var jsonToPost = {
-  user_id : "d7fc2248-d1bb-4ca0-9539-bf0d30687163",
-  folder_name : "Reference_Test"
+  user_id : "8e1866c6-4128-4656-96c3-3b96615dc18f",
+  folder_name : "New_folder"
 }
 
 var request = new Request('https://localhost:8080/api/delete_folder',{
