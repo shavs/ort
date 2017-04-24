@@ -96,7 +96,7 @@ header > h1 {
   flex: 1;
 }
 
-.folder-names-list {
+#folder-names-list {
   list-style-type: none;
   margin: 0px;
   padding: 0px;
@@ -113,8 +113,6 @@ header > h1 {
   padding: 0.5em;
 }
 
-
-
 .folder-references {
   background: #EEE;
   overflow: auto;
@@ -122,13 +120,14 @@ header > h1 {
 }
 
 #folder-create-folder-dialog {
-  display: none;
 }
 
 #folder-display {
-  display: none;
 }
 
 #folder-create-reference-dialog {
+}
+
+.dialog-hide {
   display: none;
 }

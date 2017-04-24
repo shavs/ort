@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <title>ORT - Offline Referencing Tool using Web Technologies</title>
-  <link rel="stylesheet" type="text/css" href="ort.css">
+  <link href="ort.css" rel="stylesheet" type="text/css">
+  <script src="dexie.js" type="text/javascript"></script>
 </head>
 <body>
   <header>
@@ -23,33 +24,43 @@
 
   <main class="folder-view">
     <nav class="folder-names">
-      <ul class="folder-names-list">
-        <li class="folder-name">Example Folder Name Here</li>
+      <ul id="folder-names-list">
         <li id="folder-create-button">Create a folder</li>
       </ul>
     </nav>
 
     <div class="folder-references">
-      <div id="folder-create-folder-dialog">
+      <div id="folder-create-folder-dialog" class="dialog-hide">
         <h2>Create a folder</h2>
         <input type="text" value="" id="folder-create-name" placeholder="Enter folder name here..."/>
-        <select>
+        <select id="folder-create-style">
           <option value="solent">Southampton Solent University (Harvard) Referencing</option>
           <option value="solentlaw">Southampton Solent University Law Referencing</option>
         </select>
-        <button type="button">Create Folder</button>
+        <button type="button" id="folder-create-form-button">Create Folder</button>
+        <p class="error"></p>
       </div>
-      <div id="folder-display">
-        
+      
+      <div id="folder-display" class="dialog-hide">
+        <p class="error-no-references"></p>
+        <button type="button" id="create-reference-button">Create a new reference</button>
       </div>
-      <div id="folder-create-reference-dialog">
+      
+      <div id="folder-create-reference-dialog" class="dialog-hide">
         <h2>Create a Reference</h2>
-        <p>(At the moment, Website is the only reference type available)</p>
-          <input type="text" value="" placeholder="Author(s)"/>
-          <input type="text" value="" placeholder="URL"/>
-          <input type="text" value="" placeholder="Date Accessed" />
-          <input type="text" value="" placeholder="Date Viewed" />
+          <select id="reference-type">
+            <option value="blank" selected></option>
+            <option value="website">Website</option>
+            <option value="book">Book</option>
+            <option value="chapter">Chapter or essay in an edited book</option>
+            <option value="tv">Television Programme / Television Broadcast</option>
+            <option value="manual">Manual Entry</option>
+          </select>
           <button type="button">Save Reference</button>
+      </div>
+      <!-- Form gets inserted into here -->
+      <div id="reference-form">
+        
       </div>
     </div>
   </main>

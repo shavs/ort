@@ -44,3 +44,23 @@ function getfolder (folder_name) {
 }
 
 getfolder("New_folder");
+
+
+
+
+
+
+db.TextStore.add({folder_name: "folder_name_here!"})
+
+db.TextStore.add({folder_name: "folder_name_here!", references : [ title : "title of a reference"]})
+
+db.TextStore.delete(1);
+
+// Update the references a folder contains
+db.TextStore.where("id").equals(6).modify({"references" : [{"type": "webpage", "author" : "Sergey Brin"}, {"type": "webpage", "author" : "Sergey Brin"}]});
+
+function update_folder_references (folder_key) {
+  // First, get the folder's current information
+  
+}
+
