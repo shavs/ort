@@ -168,7 +168,7 @@ function display_folder_contents (folder_name) {
           
           if (references.length === 0 || !references) {
             console.log("[ORT.JS] No references to display:", references, references.length);
-            document.querySelector(".error-no-references").innerText = "No references available. Please create a reference using the button below.";
+            document.querySelector(".error-no-references").innerText = "No references available for " + folder_name + ".\n\n Please create a reference using the button below.";
           } else {
             // If there are any references to display
             console.log("[ORT.JS] There are references to display:", references, references.length);
@@ -313,28 +313,7 @@ function add_reference_info(folder_name) {
         
         var ref_info = {};
         
-        if (reference_type === "website") {
-          console.log("[ORT.JS] Reference is a website.");
-
-          for (let c = 0; c < reference_form.childNodes.length; c++) {
-            let child = reference_form.childNodes[c];
-            console.log("[ORT.JS] Found Child: ", child);
-            
-            // We only need input tags
-            if (child.tagName.toLowerCase() === "input") {
-              console.log("[ORT.JS] Found the tag", child.tagName.toLowerCase);
-              // Append the property name and the value of the named property
-              ref_info[child.name] = child.value;
-              // One check that might be needed is if any of the values are
-              // empty
-            }
-          }
-
-          // Get the reference type, and append it to the object.
-          ref_info["type"] = document.getElementById("reference-type").value;
-          Object.keys(ref_info).sort();
-          
-        } else if (reference_type === "book") {
+        if (reference_type === "book" || reference_type === "chapter" || reference_type === "conference" || reference_type === "journal" || reference_type === "blog"  || reference_type === "image" || reference_type === "newspaper_magazine" || reference_type === "online_report"|| reference_type === "tv" || reference_type === "website") {
           console.log("[ORT.JS] Reference is a website.");
 
           for (let c = 0; c < reference_form.childNodes.length; c++) {
@@ -355,36 +334,12 @@ function add_reference_info(folder_name) {
           ref_info["type"] = document.getElementById("reference-type").value;
           Object.keys(ref_info).sort();
 
-          // TODO
-
-        } else if (reference_type === "chapter") {
-          console.log("[ORT.JS] Reference is a chapter.");
-
-          for (let c = 0; c < reference_form.childNodes.length; c++) {
-            let child = reference_form.childNodes[c];
-            console.log("[ORT.JS] Found Child: ", child);
-            
-            // We only need input tags
-            if (child.tagName.toLowerCase() === "input") {
-              console.log("[ORT.JS] Found the tag", child.tagName.toLowerCase);
-              // Append the property name and the value of the named property
-              ref_info[child.name] = child.value;
-              // One check that might be needed is if any of the values are
-              // empty
-            }
-          }
-
-          // Get the reference type, and append it to the object.
-          ref_info["type"] = document.getElementById("reference-type").value;
-          Object.keys(ref_info).sort();
-        } else if (reference_type === "tv") {
-          console.log("[ORT.JS] Reference is a TV Programme.");
-          
         } else if (reference_type === "manual") {
           console.log("[ORT.JS] Manual reference selected.");
-          
+          // For now, do nothing
         } else {
           console.log("[ORT.JS] No reference type found. Don't do anything.", reference_type);
+          
         }
 
         console.log("[ORT.JS]", ref_info);
@@ -589,7 +544,116 @@ document.getElementById("reference-type").addEventListener("click", function () 
       reference_form.appendChild(newPages);
 
       
+    } else if (reference_form_type === "conference") {
+    
+      let newAuth = document.createElement("input");
+      newAuth.type = "text";
+      newAuth.placeholder = "Please enter the authors, formatted correctly. Authors / Editors of the chapter";
+      newAuth.name = "authors_of_chapter";
+      reference_form.appendChild(newAuth);
+
+      let newYP = document.createElement("input");
+      newYP.type = "text";
+      newYP.maxlength = "4";
+      newYP.minlength = "4";
+      newYP.placeholder = "yyyy - Date Published";
+      newYP.name = "date_published";
+      reference_form.appendChild(newYP);
+
+      let newChapTitle = document.createElement("input");
+      newChapTitle.type = "text";
+      newChapTitle.placeholder = "Title of Chapter/Essay";
+      newChapTitle.name = "chapter_title";
+      reference_form.appendChild(newChapTitle);
+
+      let newEdBook = document.createElement("input");
+      newEdBook.type = "text";
+      newEdBook.placeholder = "Authors of the book / Editors of the book";
+      newEdBook.name = "authors_of_book";
+      reference_form.appendChild(newEdBook);
+
+      let newTitle = document.createElement("input");
+      newTitle.type = "text";
+      newTitle.placeholder = "Title of Book";
+      newTitle.name = "title";
+      reference_form.appendChild(newTitle);
       
+      let newEd = document.createElement("input");
+      newEd.type = "text";
+      newEd.placeholder = "Edition (leave blank if not applicable)";
+      newEd.name = "edition";
+      reference_form.appendChild(newEd);
+
+      let newDate = document.createElement("input");
+      newDate.type = "text";
+      newDate.placeholder = "Date and place of Conference";
+      newDate.name = "date_of_conference";
+      reference_form.appendChild(newDate);
+
+      let newPlace = document.createElement("input");
+      newPlace.type = "text";
+      newPlace.placeholder = "Place of Publication";
+      newPlace.name = "place_of_publication";
+      reference_form.appendChild(newPlace);
+
+      let newPub = document.createElement("input");
+      newPub.type = "text";
+      newPub.placeholder = "Publisher";
+      newPub.name = "publisher";
+      reference_form.appendChild(newPub);
+
+      let newPages = document.createElement("input");
+      newPages.type = "text";
+      newPages.placeholder = "Pages (formatted as: \"pp.n-n\", where n is a number)";
+      newPages.name = "pages";
+      reference_form.appendChild(newPages);
+    
+    } else if (reference_form_type === "journal") {
+      // Authors
+      // Year of Publication
+      // Title of Article
+      // Title of Journal
+      // Volume and Part number
+      // pages
+
+      let newAuth = document.createElement("input");
+      newAuth.type = "text";
+      newAuth.placeholder = "Please enter the authors, formatted correctly. Authors / Editors of the chapter";
+      newAuth.name = "authors_of_chapter";
+      reference_form.appendChild(newAuth);
+
+      let newYP = document.createElement("input");
+      newYP.type = "text";
+      newYP.maxlength = "4";
+      newYP.minlength = "4";
+      newYP.placeholder = "yyyy - Date Published";
+      newYP.name = "date_published";
+      reference_form.appendChild(newYP);
+
+      let newArtTitle = document.createElement("input");
+      newArtTitle.type = "text";
+      newArtTitle.placeholder = "Title of Article";
+      newArtTitle.name = "article_title";
+      reference_form.appendChild(newArtTitle);
+
+      let newTitle = document.createElement("input");
+      newTitle.type = "text";
+      newTitle.placeholder = "Title of Journal";
+      newTitle.name = "journal_title";
+      reference_form.appendChild(newTitle);
+
+      let newVolNum = document.createElement("input");
+      newVolNum.type = "text";
+      newVolNum.placeholder = "Volume Number (issue or part number)";
+      newVolNum.name = "volume_number";
+      reference_form.appendChild(newVolNum);
+      
+      let newPages = document.createElement("input");
+      newPages.type = "text";
+      newPages.placeholder = "Pages (formatted as: \"pp.n-n\", where n is a number)";
+      newPages.name = "pages";
+      reference_form.appendChild(newPages);
+    
     } else if (reference_form_type === "tv") {
       console.log("[ORT.JS] Reference was a TV Broadcast. Creating TV Broadcast form.");
       // Title
@@ -665,6 +729,7 @@ function export_references (folder_name)  {
         newExportCtn.style.width = "80%";
         newExportCtn.style.height = "25vh";
         newExportCtn.style.display = "block";
+        
         // Got the references
         for (let f = 0; f < references.length; f++) {
           console.log(references[f]);
@@ -677,6 +742,38 @@ function export_references (folder_name)  {
             // 2. Capitalise the parts of the array that are not " and "
             // 3. Join the whole string together again
             // 4. reassign the authors part.
+            var split_authors = references[f].authors.split(" / ");
+            var authors = [];
+            for (let i = 0; i < split_authors.length; i++) {
+              if (split_authors[i] !== " / " && split_authors[i] !== "") {
+                authors.push(split_authors[i]);
+              }
+            }
+            
+            if (authors.length === 1) {
+              references[f].authors = "" + authors[0].toUpperCase() + "";
+            } else if (authors.length === 2) {
+              references[f].authors = "" + authors[0].toUpperCase() + " and " + authors[1].toUpperCase() + "";
+            } else if (authors.length === 3) {
+              references[f].authors = "" + authors[0].toUpperCase() + ", " + authors[1].toUpperCase() + " and " + authors[2].toUpperCase() + "";
+            } else if (authors.length > 3) {
+              references[f].authors = "" + authors[0].toUpperCase() + " et al."; 
+            } else {
+              references[f].authors = "It looks like there either ";
+            }
+
+            console.log(references[f].authors, authors);
+            
+            var string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].title + " [viewed " + processDate(references[f].date_accessed) + "]. Available from: " + references[f].url;
+            console.log("[ORT.JS] Constructed Reference:", string);
+            // Insert into the textarea
+            newExportCtn.value = newExportCtn.value + string + "\n\n";
+            
+            // Next reference!
+          } else if (references[f].type === "book") {
+            console.log("[ORT.JS] Book found, processing...");
+
+            // Split the authors
             var split_authors = references[f].authors.split(" and ");
             for (let i = 0; i < split_authors.length; i++) {
               if (split_authors[i] !== " and ") {
@@ -685,43 +782,119 @@ function export_references (folder_name)  {
             }
             references[f].authors = split_authors.join(" and ");
             
-            var string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].title + " [viewed " + processDate(references[f].date_accessed) + "]. Available from: " + references[f].url;
-            console.log("[ORT.JS] Constructed Reference:", string);
-            // Insert into the textarea
-            newExportCtn.value = newExportCtn.value + string + "\n\n";
-            // Next reference!
-          } else if (references[f].type === "book") {
-            console.log("[ORT.JS] Book found, processing...");
             // Check if the edition is not blank
             if (references[f].edition !== "") {
               references[f].edition = references[f].edition + ". ";
             }
 
             // TODO
-            
-            var string = "" + references[f].authors.toUpperCase() + ", " + references[f].date_published + ". " + references[f].title + ". " + references[f].edition + "" + references[f].place_of_publication + ": " + references[f].publisher;
+            var string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].title + ". " + references[f].edition + "" + references[f].place_of_publication + ": " + references[f].publisher;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
+            
             // Next reference!
           } else if (references[f].type === "chapter") {
             console.log("[ORT.JS] Chapter of edited book found, processing...");
 
+            // Split the authors
+            var split_authors = references[f].authors_of_chapter.split(" and ");
+            for (let i = 0; i < split_authors.length; i++) {
+              if (split_authors[i] !== " and ") {
+                split_authors[i] = split_authors[i].toUpperCase();
+              }
+            }
+            references[f].authors_of_chapter = split_authors.join(" and ");
+
+            // Split the authors
+            var split_authors_b = references[f].authors_of_book.split(" and ");
+            var count = 0;
+            for (let i = 0; i < split_authors_b.length; i++) {
+              if (split_authors_b[i] !== " and ") {
+                split_authors_b[i] = split_authors_b[i].toUpperCase();
+                count++;
+              }
+            }
+            references[f].authors_of_book = split_authors_b.join(" and ");
+            if (count === 1) {
+              references[f].authors_of_book = references[f].authors_of_book + ", ed. ";
+            } else if (count >= 2) {
+              references[f].authors_of_book = references[f].authors_of_book + ", eds. ";
+            } else {
+              references[f].authors_of_book = references[f].authors_of_book + ", . ";
+            }
+
             // Check if the edition is not blank
             if (references[f].edition !== "") {
               references[f].edition = references[f].edition + ". ";
             }
 
-            // TODO
-            var string = "" + references[f].authors_of_chapter.toUpperCase() + ", " + references[f].date_published + ". " + references[f].chapter_title + ". In: " + references[f].authors_of_book.toUpperCase() + ", " + references[f].edition + "" + references[f].place_of_publication + ": " + references[f].publisher + ", " + references[f].pages;
+            var string = "" + references[f].authors_of_chapter + ", " + references[f].date_published + ". " + references[f].chapter_title + ". In: " + references[f].authors_of_book + "" + references[f].title + ". " + references[f].edition + "" + references[f].place_of_publication + ": " + references[f].publisher + ", " + references[f].pages;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             // Next Reference!
+          } else if (references[f].type === "conference") {
+            
+            // Split the authors
+            var split_authors = references[f].authors_of_chapter.split(" and ");
+            for (let i = 0; i < split_authors.length; i++) {
+              if (split_authors[i] !== " and ") {
+                split_authors[i] = split_authors[i].toUpperCase();
+              }
+            }
+            references[f].authors_of_chapter = split_authors.join(" and ");
+
+            // Split the authors
+            var split_authors_b = references[f].authors_of_book.split(" and ");
+            var count = 0;
+            for (let i = 0; i < split_authors_b.length; i++) {
+              if (split_authors_b[i] !== " and ") {
+                split_authors_b[i] = split_authors_b[i].toUpperCase();
+                count++;
+              }
+            }
+            references[f].authors_of_book = split_authors_b.join(" and ");
+            if (count === 1) {
+              references[f].authors_of_book = references[f].authors_of_book + ", ed. ";
+            } else if (count >= 2) {
+              references[f].authors_of_book = references[f].authors_of_book + ", eds. ";
+            } else {
+              references[f].authors_of_book = references[f].authors_of_book + ", . ";
+            }
+
+            // Check if the edition is not blank
+            if (references[f].edition !== "") {
+              references[f].edition = references[f].edition + ". ";
+            }
+
+            var string = "" + references[f].authors_of_chapter + ", " + references[f].date_published + ". " + references[f].chapter_title + ". In: " + references[f].authors_of_book + ", " + references[f].edition + "" + references[f].place_of_publication + ": " + references[f].publisher + ", " + references[f].pages;
+            newExportCtn.value = newExportCtn.value + string + "\n\n";
+            
+            // Next reference!
+          } else if (references[f].type === "journal") {
+            console.log("[ORT.JS] Journal article found, processing...");
+            // Split the authors
+            var split_authors = references[f].authors.split(" and ");
+            for (let i = 0; i < split_authors.length; i++) {
+              if (split_authors[i] !== " and ") {
+                split_authors[i] = split_authors[i].toUpperCase();
+              }
+            }
+            references[f].authors = split_authors.join(" and ");
+
+            var string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].article_title + ". " + references[f].journal_title + ", " + references[f].volume_number + ", " + references[f].pages;
+            newExportCtn.value = newExportCtn.value + string + "\n\n";
+            
+            // Next reference!
           } else if (references[f].type === "tv") {
             console.log("[ORT.JS] TV Programme found, processing...");
+
+            // Next Reference!
           } else {
             console.log("[ORT.JS] Reference has never been encountered before.");
           }
           // Append the new reference to the value of the textarea,
           // with a paragraph in between
         }
+        // Sort the textarea by alphabetical order
+        newExportCtn.value = newExportCtn.value.split("\n\n").sort().join("\n\n");
         // Append the new textarea to the folder-display
         document.getElementById("folder-display").appendChild(newExportCtn);
       } else {
@@ -829,3 +1002,4 @@ function processDate (date) {
     return string;
   }
 }
+
