@@ -1,5 +1,6 @@
+'esversion: 6'
 console.log("--------------------------------------------------");
-var SERVER_URL = "https://localhost:8080/"
+var SERVER_URL = "https://localhost:8080/";
 
 // Create a new database for the folders,
 // if it doesn't already exist
@@ -11,7 +12,7 @@ db.version(1).stores({
 }).upgrade(function (){
   // Do something if the IDB needs updating.
   console.log("[ORT.JS] Database is being upgraded.");
-})
+});
 
 window.addEventListener('load', function () {
   try {
@@ -353,7 +354,6 @@ function add_reference_info(folder_name) {
         db.TextStore.put(results[0]);
 
         // Remove the contents of the form
-        var reference_form = document.getElementById("reference-form");
         reference_form.innerHTML = "";
 
         // Display the contents of the folder to the user again
@@ -738,10 +738,13 @@ function export_references (folder_name)  {
             // Now, format the string correctly
 
             // Format the authors correctly
-            // 1. Split the string where there is (" and ")
-            // 2. Capitalise the parts of the array that are not " and "
+            // 1. Split the string where there is (" / ")
+            // 2. Capitalise the parts of the array that are not " / "
             // 3. Join the whole string together again
             // 4. reassign the authors part.
+
+            
+            // TODO - Append this to each of the new 
             var split_authors = references[f].authors.split(" / ");
             var authors = [];
             for (let i = 0; i < split_authors.length; i++) {
@@ -759,7 +762,7 @@ function export_references (folder_name)  {
             } else if (authors.length > 3) {
               references[f].authors = "" + authors[0].toUpperCase() + " et al."; 
             } else {
-              references[f].authors = "It looks like there either ";
+              // Do nothing - as the user may have a better idea.
             }
 
             console.log(references[f].authors, authors);
