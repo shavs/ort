@@ -11,13 +11,10 @@
     <h1>Offline Referencing Tool</h1>
     <div class="reference-buttons">
       <div class="reference-button">
-        <p id="folder-get">Get Folder</p>
+        <a href="https://github.com/shavs/ort/">Help</a>
       </div>
       <div class="reference-button">
-        <p id="folder-save">Save Folder</p>
-      </div>
-      <div class="reference-button">
-        <p id="folder-delete">Delete Folder</p>
+        <a href="https://github.com/shavs/ort/">Link to GitHub page</a>
       </div>
     </div>
   </header>
@@ -50,7 +47,6 @@
         <h2>Create a Reference</h2>
           <select id="reference-type">
             <option value="blank" selected></option>
-            <option value="website">Website</option>
             <option value="book">Book</option>
             <option value="chapter">Chapter or essay in an edited book</option>
             <option value="conference">Conference Paper - as part of published proceedings</option>
@@ -60,8 +56,8 @@
             <option value="film">Film or DVD/video</option>
             <option value="newspaper_magazine">Newspaper or Magazine Article</option>
             <option value="online_report">Online Report</option>
-            <option value=""></option>
             <option value="tv">Television Programme / Television Broadcast</option>
+            <option value="website">Website</option>
             <option value="manual">Manual Entry</option>
           </select>
           <button type="button">Save Reference</button>
@@ -75,7 +71,5 @@
 
   <!-- Main script that gets, displays, and manages folders and references-->
   <script src="ort.js" type="text/javascript"></script>
-  <!-- Service Worker -->
-  <script src="ort_service_worker.js" type="text/javascript"></script>
 </body>
 </html>

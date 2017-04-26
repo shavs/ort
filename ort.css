@@ -3,14 +3,15 @@
 html {
   padding: 0em;
   margin: 0em;
-  background-color: blue;
-  width: 100%;
-  height: 100%;
+  background-color: white;
+  width: auto;
+  height: auto;
   font-family: "Roboto", Arial, sans-serif;
 }
 
 body {
   min-height: 100vh;
+  max-width: 100vw;
   background: white;
   position: relative;
   margin: 0em;
@@ -60,19 +61,25 @@ header {
   margin: 0px;
   padding: 0px;
   width: 100%;
-  background-color: wheat;
+  background-color: #2196f3;
+  color: white;
   display: flex;
+  justify-content: space-around;
+  align-items: center;
+  align-content: stretch;
+  
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
 header > h1 {
-  flex: 1;
   width: auto;
   display: inline-block;
   float: left;
+  vertical-align: middle;
+  text-align: center;
 }
 
 .reference-buttons {
-  flex: 1;
   display: flex;
   width: auto;
   flex-flow: row nowrap;
@@ -83,18 +90,38 @@ header > h1 {
 }
 
 .reference-button {
-  cursor: pointer;
+  flex: auto;
+  padding: 1rem;
+  margin: 1rem;
+  color: white;
+  text-decoration: none;
 }
+
+.reference-button > a {
+  color: white;
+  text-decoration: none;
+}
+
+.reference-button > a:hover {
+  color: white;
+}
+
+.reference-button > a:active {
+  color: white;
+}
+
 
 /* Main body of document */
 .folder-view {
-  background: magenta;
+  background: grey;
   display: flex;
+  margin: 1rem;
 }
 
 .folder-names {
   background: #DDD;
   flex: 1;
+  min-height: 80vh;
 }
 
 #folder-names-list {
@@ -102,6 +129,13 @@ header > h1 {
   margin: 0px;
   padding: 0px;
   text-align: center;
+  position: relative;
+}
+
+#folder-names-list > li:last-child {
+  font-weight: bold;
+  position: relative;
+  bottom: 0px;
 }
 
 .folder-name {
@@ -116,14 +150,20 @@ header > h1 {
 
 .folder-references {
   background: #EEE;
-  overflow: auto;
+  overflow: scroll;
   flex: 3;
+  max-height: 80vh;
 }
 
 #folder-create-folder-dialog {
 }
 
 #folder-display {
+
+}
+
+#folder-display > button {
+  display: block;
 }
 
 #folder-create-reference-dialog {
@@ -133,20 +173,54 @@ header > h1 {
   display: none;
 }
 
-#reference-type {
-  
-}
-
-#reference-type {
-  
-}
-
-#reference-form {
-  
-}
-
 #reference-form > input {
   display:block;
   margin: 0px auto;
   width: 80%;
+}
+
+#folder-display > textarea {
+  width: 80%;
+  display: block;
+  margin: 0px auto;
+}
+
+table {
+  margin: auto;
+  width: 75%;
+  border-collapse: collapse;
+}
+
+table > tr {
+  border: 1px solid black;
+}
+table > tr > th {
+  border-right: 1px solid black;
+}
+table > tr > * {
+  padding: 0.5rem;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+.reference {
+  background: #bbdefb;
+  margin: 1rem auto;
+  width: 50%;
+  padding: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.reference > h4 {
+  display: block;
+  width: 50%;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  margin: 0.5rem 0.5rem 0.5rem 0.5rem;
+}
+
+.reference > button {
+  display: inline-block;
+  margin: 0.5rem 0px 0.25rem 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  margin: 0.5rem 0.5rem 0.5rem 0.5rem;
 }

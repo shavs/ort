@@ -1,6 +1,11 @@
-'esversion: 6'
+/*jshint esversion: 6 */
 console.log("--------------------------------------------------");
 var SERVER_URL = "https://localhost:8080/";
+
+// Check if the browser supports IndexedDB
+// Also needed to check if IDB is available within Private Mode / Incognito
+// https://github.com/dfahlander/Dexie.js/issues/312
+
 
 // Create a new database for the folders,
 // if it doesn't already exist
@@ -9,10 +14,18 @@ var db = new Dexie("folder_database");
 // Next, create the database with the set version
 db.version(1).stores({
   TextStore: "++id, folder_name"
-}).upgrade(function (){
+}).upgrade(function (version){
   // Do something if the IDB needs updating.
   console.log("[ORT.JS] Database is being upgraded.");
 });
+
+var result;
+db.open().catch(function (error){
+  result = "enabled";
+  document.body.innerHTML = "";
+  document.body.innerHTML = "<h1>ERROR: IndexedDB is not supported in this browser OR this browser is in Private Mode / Incognito.</h1><p>This service requires the lastest browsers to use. Please try using:</p><ul><li>Mozilla Firefox</li><li>Google Chrome</li><li>Chromium</li></ul><p>outside of Private Browsing mode.</p><p>" + error + "</p>";
+});
+console.log("[ORT.JS] Result of IDB test: ", result);
 
 window.addEventListener('load', function () {
   try {
@@ -54,7 +67,8 @@ window.addEventListener('load', function () {
   } catch (e) {
     console.log("[ORT.JS] Looks like localStorage is not supported.");
     console.log(e);
-    document.write("<h1>ERROR: localStorage is not supported by this browser.</h1><p>This service requires the lastest browsers to use. Please try using:</p><ul><li>Mozilla Firefox</li><li>Google Chrome</li><li>Chromium</li></ul>");
+    document.body.innerHTML = "";
+    document.body.innerHTML = "<h1>ERROR: localStorage is not supported by this browser.</h1><p>This service requires the lastest browsers to use. Please try using:</p><ul><li>Mozilla Firefox</li><li>Google Chrome</li><li>Chromium</li></ul>";
   }
 });
 
@@ -68,6 +82,14 @@ function update_folder_names () {
     console.log("[ORT.JS] Result of Search: ", results);
     if (results.length === 0) {
       console.log("[ORT.JS] No folder names to display.");
+      let folder_names_list = document.getElementById("folder-names-list");
+      let folder_create_button = document.getElementById("folder-create-button");
+
+      console.log("[ORT.JS] Length of results:", results.length);
+      // Next, remove all of the li buttons
+      folder_names_list.innerHTML = "";
+      folder_names_list.appendChild(folder_create_button);
+      
     } else {
       console.log("[ORT.JS] Displaying each of the folder names");
       let folder_names_list = document.getElementById("folder-names-list");
@@ -145,6 +167,16 @@ function display_folder_contents (folder_name) {
           let createErrorPar = document.createElement("p");
           createErrorPar.classList.add("error-no-references");
           folder_display.appendChild(createErrorPar);
+
+          // Create the heading element with the folder title inside:
+          let newFT = document.createElement("h3");
+          newFT.innerText = "" + folder_name + "";
+          folder_display.appendChild(newFT);
+
+          // Give a paragraph tag for some folder controls
+          let newBT = document.createElement("h4");
+          newBT.innerText = "Folder Controls";
+          folder_display.appendChild(newBT);
           
           // Append the "create reference" button
           let newRefButton = document.createElement("button");
@@ -166,6 +198,16 @@ function display_folder_contents (folder_name) {
           });
           folder_display.appendChild(newExpBtn);
 
+          // Append the "export references" button
+          let newDelBtn = document.createElement("button");
+          newDelBtn.type="button";
+          newDelBtn.innerText = "Delete this folder";
+          newDelBtn.addEventListener("click", function () {
+            // Exports the folder - needs only the folder name
+            delete_folder(folder_name);
+          });
+          folder_display.appendChild(newDelBtn);
+
           
           if (references.length === 0 || !references) {
             console.log("[ORT.JS] No references to display:", references, references.length);
@@ -185,7 +227,7 @@ function display_folder_contents (folder_name) {
               newDiv.className = "reference";
               // Create a small title for each of the references
               newRefTitle = document.createElement("h4");
-              newRefTitle.innerText = "Reference " + (i + 1);
+              newRefTitle.innerText = "Reference " + (i + 1) + " - type: " + removeUnderscores(references[i].type) + "";
               newDiv.appendChild(newRefTitle);
 
               // Append a delete button
@@ -204,26 +246,39 @@ function display_folder_contents (folder_name) {
               //newEditButton.type = "button";
               //newEditButton.innerText = "Edit this Reference";
               //newEditButton.addEventListener("click", function(){
-                //edit_reference();
+                //edit_reference(folder_name, delval);
               //});
               //newDiv.appendChild(newEditButton);
 
               // For each property that the reference has
+    
+              // First, create a table
+
+              var newTable = document.createElement("table");
+              
               var keys = Object.keys(references[i]);
               keys.sort();
 
               for (var p = 0; p < keys.length; p++) {
-                let k = keys[p];
-                
-                newPar = document.createElement("p");
-                newPar.className = "reference_info";
-                newPar.innerText = "" + k.charAt(0).toUpperCase() + k.slice(1) + ": " + references[i][k];
-
-                // Append the new property to the document element
-                console.log("[ORT.JS] New Element Created:", newPar, newPar.innerText);
-                newDiv.appendChild(newPar);
+                // Create the table row
+                var k = keys[p];
+                if (k !== "type") {
+                  var newTableRow = document.createElement("tr");
+                  let k_n = k.charAt(0).toUpperCase() + k.slice(1);
+                  let key_name = removeUnderscores(k_n);
+                  let newTH = document.createElement("th");
+                  newTH.innerText = "" + key_name + "";
+                  newTableRow.appendChild(newTH);
+                  let newTD = document.createElement("td");
+                  newTD.innerText = "" + references[i][k] + "";
+                  newTableRow.appendChild(newTD);
+                  // Append the new property to the document element
+                  console.log("[ORT.JS] New Element Created:", newTH, newTH.innerText, newTD, newTD.innerText);
+                  newTable.appendChild(newTableRow);
+                }
               }
               // Append the new reference div to the document
+              newDiv.appendChild(newTable);
               document.getElementById("folder-display").appendChild(newDiv);
             }
           }
@@ -258,6 +313,9 @@ function add_reference (folder_name) {
         document.getElementById("folder-create-reference-dialog").classList.remove("dialog-hide");
         document.getElementById("folder-create-folder-dialog").classList.add("dialog-hide");
         document.getElementById("folder-display").classList.add("dialog-hide");
+
+        // Reset the value of the select to the "blank" option
+        document.getElementById("reference-type").options[0].selected = true;
         
         // Get the button, remove it, then add a new button with an additional event listener
         var save_reference_button = document.getElementById("folder-create-reference-dialog").querySelector("button");
@@ -314,7 +372,7 @@ function add_reference_info(folder_name) {
         
         var ref_info = {};
         
-        if (reference_type === "book" || reference_type === "chapter" || reference_type === "conference" || reference_type === "journal" || reference_type === "blog"  || reference_type === "image" || reference_type === "newspaper_magazine" || reference_type === "online_report"|| reference_type === "tv" || reference_type === "website") {
+        if (reference_type === "book" || reference_type === "chapter" || reference_type === "conference" || reference_type === "journal" || reference_type === "blog"  || reference_type === "image" || reference_type === "film" || reference_type === "newspaper_magazine" || reference_type === "online_report"|| reference_type === "tv" || reference_type === "website") {
           console.log("[ORT.JS] Reference is a website.");
 
           for (let c = 0; c < reference_form.childNodes.length; c++) {
@@ -325,14 +383,14 @@ function add_reference_info(folder_name) {
             if (child.tagName.toLowerCase() === "input") {
               console.log("[ORT.JS] Found the tag", child.tagName.toLowerCase);
               // Append the property name and the value of the named property
-              ref_info[child.name] = child.value;
+              ref_info[child.name] = child.value.trim();
               // One check that might be needed is if any of the values are
               // empty
             }
           }
 
           // Get the reference type, and append it to the object.
-          ref_info["type"] = document.getElementById("reference-type").value;
+          ref_info.type = document.getElementById("reference-type").value;
           Object.keys(ref_info).sort();
 
         } else if (reference_type === "manual") {
@@ -367,7 +425,7 @@ function add_reference_info(folder_name) {
 }
 
 // Event listener that waits and generates the appropriate fields for the references
-document.getElementById("reference-type").addEventListener("click", function () {
+document.getElementById("reference-type").addEventListener("change", function () {
   var reference_form_type = document.getElementById("reference-type").value;
   if (!reference_form_type) {
     // The form type is not valid
@@ -586,7 +644,7 @@ document.getElementById("reference-type").addEventListener("click", function () 
 
       let newDate = document.createElement("input");
       newDate.type = "text";
-      newDate.placeholder = "Date and place of Conference";
+      newDate.placeholder = "Date and place of Conference - Formatted nn-nn MMM, YYYY.";
       newDate.name = "date_of_conference";
       reference_form.appendChild(newDate);
 
@@ -619,7 +677,7 @@ document.getElementById("reference-type").addEventListener("click", function () 
       let newAuth = document.createElement("input");
       newAuth.type = "text";
       newAuth.placeholder = "Please enter the authors, formatted correctly. Authors / Editors of the chapter";
-      newAuth.name = "authors_of_chapter";
+      newAuth.name = "authors";
       reference_form.appendChild(newAuth);
 
       let newYP = document.createElement("input");
@@ -650,10 +708,155 @@ document.getElementById("reference-type").addEventListener("click", function () 
       
       let newPages = document.createElement("input");
       newPages.type = "text";
-      newPages.placeholder = "Pages (formatted as: \"pp.n-n\", where n is a number)";
+      newPages.placeholder = "Pages (formatted as: \"n-n\", where n is a number)";
       newPages.name = "pages";
       reference_form.appendChild(newPages);
     
+    } else if (reference_form_type === "blog") {
+
+      // Authors
+      // Year published
+      // Title of the entry
+      // Title of blog
+      // Full date of blog entry
+      // Viewed date of blog entry
+      // URL
+
+      let newAuth = document.createElement("input");
+      newAuth.type = "text";
+      newAuth.placeholder = "Please enter the authors, formatted correctly";
+      newAuth.name = "authors";
+      reference_form.appendChild(newAuth);
+      
+      let newBlogEntryTitle = document.createElement("input");
+      newBlogEntryTitle.type = "text";
+      newBlogEntryTitle.placeholder = "Title of Blog Entry";
+      newBlogEntryTitle.name = "title_of_entry";
+      reference_form.appendChild(newBlogEntryTitle);
+
+      let newBlogTitle = document.createElement("input");
+      newBlogTitle.type = "text";
+      newBlogTitle.placeholder = "Title of Blog";
+      newBlogTitle.name = "title_of_blog";
+      reference_form.appendChild(newBlogTitle);
+      
+      let newYP = document.createElement("input");
+      newYP.type = "text";
+      newYP.maxlength = "4";
+      newYP.minlength = "4";
+      newYP.placeholder = "yyyy - Date Published";
+      newYP.name = "date_published";
+      reference_form.appendChild(newYP);
+
+      let newPA = document.createElement("p");
+      newPA.innerText = "Date Accessed";
+      newPA.classList.add("ref_par");
+      reference_form.appendChild(newPA);
+      
+      let newDA = document.createElement("input");
+      newDA.type = "text";
+      newDA.maxlength = "10";
+      newDA.placeholder = "yyyy-mm-dd";
+      newDA.name = "date_accessed";
+      reference_form.appendChild(newDA);
+
+      let newDAF = document.createElement("input");
+      newDAF.type = "text";
+      newDAF.maxlength = "10";
+      newDAF.placeholder = "yyyy-mm-dd";
+      newDAF.name = "date_published_full";
+      reference_form.appendChild(newDAF);
+      
+      let newURL = document.createElement("input");
+      newURL.type = "url";
+      newURL.placeholder = "URL";
+      newURL.name = "url";
+      reference_form.appendChild(newURL);
+
+    
+    } else if (reference_form_type === "image") {
+      // Originators / Authors - authors
+      // Date Published - date_published
+      // Title image - title 
+      // Date Viewed - date_accessed
+      // URL - url
+
+      let newAuth = document.createElement("input");
+      newAuth.type = "text";
+      newAuth.placeholder = "Please enter the authors, formatted correctly";
+      newAuth.name = "authors";
+      reference_form.appendChild(newAuth);
+
+      let newYP = document.createElement("input");
+      newYP.type = "text";
+      newYP.maxlength = "4";
+      newYP.minlength = "4";
+      newYP.placeholder = "yyyy - Date Published";
+      newYP.name = "date_published";
+      reference_form.appendChild(newYP);
+
+      let newTitle = document.createElement("input");
+      newTitle.type = "text";
+      newTitle.placeholder = "Title of image";
+      newTitle.name = "title";
+      reference_form.appendChild(newTitle);
+
+      let newDA = document.createElement("input");
+      newDA.type = "text";
+      newDA.maxlength = "10";
+      newDA.placeholder = "yyyy-mm-dd";
+      newDA.name = "date_accessed";
+      reference_form.appendChild(newDA);
+
+      let newURL = document.createElement("input");
+      newURL.type = "url";
+      newURL.placeholder = "URL";
+      newURL.name = "url";
+      reference_form.appendChild(newURL);
+    
+    } else if (reference_form_type === "film") {
+      // Title - title
+      // Year
+      // Material designation (already filled in with [film])
+      // Subsidiary Originator - originator
+      // Production Details
+      let newTitle = document.createElement("input");
+      newTitle.type = "text";
+      newTitle.placeholder = "Title of film or video";
+      newTitle.name = "title";
+      reference_form.appendChild(newTitle);
+
+      let newYP = document.createElement("input");
+      newYP.type = "text";
+      newYP.maxlength = "4";
+      newYP.minlength = "4";
+      newYP.placeholder = "yyyy - Date Published";
+      newYP.name = "date_published";
+      reference_form.appendChild(newYP);
+
+      let mat_des = document.createElement("input");
+      mat_des.type = "text";
+      mat_des.placeholder = "Material Designation (for a film, enter [film] ).";
+      mat_des.value = "[film]";
+      mat_des.name = "material_designation";
+      reference_form.appendChild(mat_des);
+
+      let newSubO = document.createElement("input");
+      newSubO.type = "text";
+      newSubO.name = "subsidiary_originator";
+      newSubO.placeholder = "Subsidiary originator";
+      reference_form.appendChild(newSubO);
+
+      let newProdDetails = document.createElement("input");
+      newProdDetails.type = "text";
+      newProdDetails.name = "production_details";
+      newProdDetails.placeholder = "Production Details";
+      reference_form.appendChild(newProdDetails);
+      
+    } else if (reference_form_type === "newspaper_magazine") {
+      
+    } else if (reference_form_type === "online_report") {
+      
     } else if (reference_form_type === "tv") {
       console.log("[ORT.JS] Reference was a TV Broadcast. Creating TV Broadcast form.");
       // Title
@@ -732,166 +935,76 @@ function export_references (folder_name)  {
         
         // Got the references
         for (let f = 0; f < references.length; f++) {
-          console.log(references[f]);
+          
           if (references[f].type === "website") {
-            console.log("[ORT.JS] Website found, processing...");
-            // Now, format the string correctly
-
-            // Format the authors correctly
-            // 1. Split the string where there is (" / ")
-            // 2. Capitalise the parts of the array that are not " / "
-            // 3. Join the whole string together again
-            // 4. reassign the authors part.
-
             
-            // TODO - Append this to each of the new 
-            var split_authors = references[f].authors.split(" / ");
-            var authors = [];
-            for (let i = 0; i < split_authors.length; i++) {
-              if (split_authors[i] !== " / " && split_authors[i] !== "") {
-                authors.push(split_authors[i]);
-              }
-            }
-            
-            if (authors.length === 1) {
-              references[f].authors = "" + authors[0].toUpperCase() + "";
-            } else if (authors.length === 2) {
-              references[f].authors = "" + authors[0].toUpperCase() + " and " + authors[1].toUpperCase() + "";
-            } else if (authors.length === 3) {
-              references[f].authors = "" + authors[0].toUpperCase() + ", " + authors[1].toUpperCase() + " and " + authors[2].toUpperCase() + "";
-            } else if (authors.length > 3) {
-              references[f].authors = "" + authors[0].toUpperCase() + " et al."; 
-            } else {
-              // Do nothing - as the user may have a better idea.
-            }
-
-            console.log(references[f].authors, authors);
-            
-            var string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].title + " [viewed " + processDate(references[f].date_accessed) + "]. Available from: " + references[f].url;
-            console.log("[ORT.JS] Constructed Reference:", string);
-            // Insert into the textarea
+            var string = "" + processAuthors(references[f].authors) + ", " + references[f].date_published + ". " + references[f].title + " [viewed " + processDate(references[f].date_accessed) + "]. Available from: " + references[f].url;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             
             // Next reference!
           } else if (references[f].type === "book") {
-            console.log("[ORT.JS] Book found, processing...");
-
-            // Split the authors
-            var split_authors = references[f].authors.split(" and ");
-            for (let i = 0; i < split_authors.length; i++) {
-              if (split_authors[i] !== " and ") {
-                split_authors[i] = split_authors[i].toUpperCase();
-              }
-            }
-            references[f].authors = split_authors.join(" and ");
             
-            // Check if the edition is not blank
-            if (references[f].edition !== "") {
-              references[f].edition = references[f].edition + ". ";
-            }
-
-            // TODO
-            var string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].title + ". " + references[f].edition + "" + references[f].place_of_publication + ": " + references[f].publisher;
+            let string = "" + processAuthors(references[f].authors) + ", " + references[f].date_published + ". " + references[f].title + ". " + processEdition(references[f].edition) + "" + references[f].place_of_publication + ": " + references[f].publisher;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             
             // Next reference!
           } else if (references[f].type === "chapter") {
-            console.log("[ORT.JS] Chapter of edited book found, processing...");
-
-            // Split the authors
-            var split_authors = references[f].authors_of_chapter.split(" and ");
-            for (let i = 0; i < split_authors.length; i++) {
-              if (split_authors[i] !== " and ") {
-                split_authors[i] = split_authors[i].toUpperCase();
-              }
-            }
-            references[f].authors_of_chapter = split_authors.join(" and ");
-
-            // Split the authors
-            var split_authors_b = references[f].authors_of_book.split(" and ");
-            var count = 0;
-            for (let i = 0; i < split_authors_b.length; i++) {
-              if (split_authors_b[i] !== " and ") {
-                split_authors_b[i] = split_authors_b[i].toUpperCase();
-                count++;
-              }
-            }
-            references[f].authors_of_book = split_authors_b.join(" and ");
-            if (count === 1) {
-              references[f].authors_of_book = references[f].authors_of_book + ", ed. ";
-            } else if (count >= 2) {
-              references[f].authors_of_book = references[f].authors_of_book + ", eds. ";
-            } else {
-              references[f].authors_of_book = references[f].authors_of_book + ", . ";
-            }
-
-            // Check if the edition is not blank
-            if (references[f].edition !== "") {
-              references[f].edition = references[f].edition + ". ";
-            }
-
-            var string = "" + references[f].authors_of_chapter + ", " + references[f].date_published + ". " + references[f].chapter_title + ". In: " + references[f].authors_of_book + "" + references[f].title + ". " + references[f].edition + "" + references[f].place_of_publication + ": " + references[f].publisher + ", " + references[f].pages;
+            
+            let string = "" + processAuthors(references[f].authors_of_chapter) + ", " + references[f].date_published + ". " + references[f].chapter_title + ". In: " + processEditors(references[f].authors_of_book) + "" + references[f].title + ". " + processEdition(references[f].edition) + "" + references[f].place_of_publication + ": " + references[f].publisher + ", " + references[f].pages;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
+            
             // Next Reference!
           } else if (references[f].type === "conference") {
-            
-            // Split the authors
-            var split_authors = references[f].authors_of_chapter.split(" and ");
-            for (let i = 0; i < split_authors.length; i++) {
-              if (split_authors[i] !== " and ") {
-                split_authors[i] = split_authors[i].toUpperCase();
-              }
-            }
-            references[f].authors_of_chapter = split_authors.join(" and ");
-
-            // Split the authors
-            var split_authors_b = references[f].authors_of_book.split(" and ");
-            var count = 0;
-            for (let i = 0; i < split_authors_b.length; i++) {
-              if (split_authors_b[i] !== " and ") {
-                split_authors_b[i] = split_authors_b[i].toUpperCase();
-                count++;
-              }
-            }
-            references[f].authors_of_book = split_authors_b.join(" and ");
-            if (count === 1) {
-              references[f].authors_of_book = references[f].authors_of_book + ", ed. ";
-            } else if (count >= 2) {
-              references[f].authors_of_book = references[f].authors_of_book + ", eds. ";
-            } else {
-              references[f].authors_of_book = references[f].authors_of_book + ", . ";
-            }
-
-            // Check if the edition is not blank
-            if (references[f].edition !== "") {
-              references[f].edition = references[f].edition + ". ";
-            }
-
-            var string = "" + references[f].authors_of_chapter + ", " + references[f].date_published + ". " + references[f].chapter_title + ". In: " + references[f].authors_of_book + ", " + references[f].edition + "" + references[f].place_of_publication + ": " + references[f].publisher + ", " + references[f].pages;
+                                                                                                                                                                                                                        // TODO Missing whether there is an editors part or not. Just needs to count.
+            let string = "" + processAuthors(references[f].authors_of_chapter) + ", " + references[f].date_published + ". " + references[f].chapter_title + ". In: " + processEditors(references[f].authors_of_book) + "" + processEdition(references[f].edition) + "" + references[f].place_of_publication + ": " + references[f].publisher + ", " + references[f].pages;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             
             // Next reference!
           } else if (references[f].type === "journal") {
-            console.log("[ORT.JS] Journal article found, processing...");
-            // Split the authors
-            var split_authors = references[f].authors.split(" and ");
-            for (let i = 0; i < split_authors.length; i++) {
-              if (split_authors[i] !== " and ") {
-                split_authors[i] = split_authors[i].toUpperCase();
-              }
-            }
-            references[f].authors = split_authors.join(" and ");
-
-            var string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].article_title + ". " + references[f].journal_title + ", " + references[f].volume_number + ", " + references[f].pages;
+            
+            let string = "" + processAuthors(references[f].authors) + ", " + references[f].date_published + ". " + references[f].article_title + ". " + references[f].journal_title + ", " + references[f].volume_number + ", " + references[f].pages;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             
             // Next reference!
-          } else if (references[f].type === "tv") {
-            console.log("[ORT.JS] TV Programme found, processing...");
+          } else if (references[f].type === "blog") {
+            
+            let string = "" + processAuthors(references[f].authors) + ", " + references[f].date_published + ". " + references[f].title_of_entry + ". In: " + references[f].title_of_blog + ". " + processDate(references[f].date_published_full) + " [viewed " + processDate(references[f].date_accessed) + "]. Available from: " + references[f].url;
+            newExportCtn.value = newExportCtn.value + string + "\n\n";
+            
+          } else if (references[f].type === "image") {
+             
+            // Originators / Authors - authors
+            // Date Published - date_published
+            // Title image - title 
+            // Date Viewed - date_accessed
+            // URL - url
+            
+            let string = "" + processAuthors(references[f].authors) + ", " + references[f].date_published + " [digital image] [viewed " + processDate(reference[f].date_accessed) + "]. Available from: " + references[f].url;
+            newExportCtn.value = newExportCtn.value + string + "\n\n";
+            
+            // Next reference
+          } else if (references[f].type === "film") {
 
+            let string = "" + references[f].title + ", " + references[f].date_published + ". " + references[f].material_designation + " " + references[f].subsidiary_originator + " " + references[f].production_details;
+            newExportCtn.value = newExportCtn.value + string + "\n\n";
+            
+            // Next reference
+          } else if (references[f].type === "newspaper_magazine") {
+          
+          
+            // Next reference
+          } else if (references[f].type === "online_report") {
+            
+            
+            
+            // Next reference
+          } else if (references[f].type === "tv") {
+
+
+            
             // Next Reference!
           } else {
-            console.log("[ORT.JS] Reference has never been encountered before.");
+            console.log("[ORT.JS] Reference type has never been encountered before.");
           }
           // Append the new reference to the value of the textarea,
           // with a paragraph in between
@@ -899,7 +1012,19 @@ function export_references (folder_name)  {
         // Sort the textarea by alphabetical order
         newExportCtn.value = newExportCtn.value.split("\n\n").sort().join("\n\n");
         // Append the new textarea to the folder-display
-        document.getElementById("folder-display").appendChild(newExportCtn);
+
+        // Remove any old textareas before continuing
+        try {
+          let textareas = document.querySelectorAll("textarea");
+          for (r = 0; r < textareas.length; r++) {
+            textareas[r].parentNode.removeChild(textareas[r]);
+          }
+        } catch (e) {
+          console.log("[ORT.JS] No textareas available.", e);
+        }
+        
+        var folder_cards = document.querySelector(".reference");
+        document.getElementById("folder-display").insertBefore(newExportCtn, folder_cards);
       } else {
         console.log("[ORT.JS] Unknown error when exporting:", folder_name, results);
       }
@@ -915,6 +1040,10 @@ document.getElementById("folder-create-button").addEventListener('click', functi
   // Remove the class from the folder create dialog
   folder_create_dialog.classList.remove("dialog-hide");
 
+  // Remove the value that the folder name creation has
+  document.getElementById("folder-create-name").value="";
+
+  
   // Add the class to the other two elements
   document.getElementById("folder-display").classList.add("dialog-hide");
   document.getElementById("folder-create-reference-dialog").classList.add("dialog-hide");
@@ -924,8 +1053,9 @@ document.getElementById("folder-create-button").addEventListener('click', functi
 document.getElementById("folder-create-form-button").addEventListener("click", function () {
   var folder_create_name = document.getElementById("folder-create-name");
   var folder_create_style = document.getElementById("folder-create-style");
-  if (!folder_create_name.value || !folder_create_style.value) {
+  if (!folder_create_name.value || !folder_create_style.value || folder_create_name.value.trim() === "" || folder_create_style.value.trim() === "") {
     console.log("[ORT.JS] Either the folder name was blank, or the style was blank.", folder_create_name.value, folder_create_style.value);
+    document.querySelector(".error").innerText = "Please enter a valid folder name before clicking \"Create Folder\".";
   } else {
     console.log("[ORT.JS] Folder Name and Folder Style:", folder_create_name.value, folder_create_style.value);
     // Next, create the folder in IndexedDB and create the next items for it
@@ -935,14 +1065,14 @@ document.getElementById("folder-create-form-button").addEventListener("click", f
       console.log("[ORT.JS] Got User ID, now checking for folder name...");
       // Search the DB to see if there is another result that is the same
       db.TextStore
-        .where("folder_name").equalsIgnoreCase(folder_create_name.value)
+        .where("folder_name").equalsIgnoreCase(folder_create_name.value.trim())
         .toArray(function(results){
           if (results.length === 0) {
             // Folder name has not been created before
             db.TextStore.add({
               user_id : UUID,
-              folder_name : folder_create_name.value,
-              folder_style : folder_create_style.value,
+              folder_name : folder_create_name.value.trim(),
+              folder_style : folder_create_style.value.trim(),
               references : []
             });
             
@@ -950,7 +1080,7 @@ document.getElementById("folder-create-form-button").addEventListener("click", f
             update_folder_names();
             // Once the names are generated, "click" the right element to
             // display it's contents
-            display_folder_contents(folder_create_name.value);
+            display_folder_contents(folder_create_name.value.trim());
 
             // Also, remove the error text that was inserted into the error field
             document.querySelector(".error").innerText = "";
@@ -966,19 +1096,63 @@ document.getElementById("folder-create-form-button").addEventListener("click", f
   } 
 });
 
+function delete_folder (folder_name) {
+  if (!folder_name) {
+    console.log("[ORT.JS] No folder name given.", folder_name);
+  } else {
+    console.log("[ORT.JS] Folder name found.", folder_name);
+
+    // Check information before deleting
+    try {
+      var UUID = localStorage.getItem("user_id");
+      console.log("[ORT.JS] Got User ID, now checking for folder name...");
+      // Search the DB to see if there is another result that is the same
+      db.TextStore
+        .where("folder_name").equals(folder_name)
+        .toArray(function(results){
+          if (results.length === 0) {
+            console.log("[ORT.JS] Error - no matching folder name", folder_name, results);
+          } else if (results.length === 1) {
+            console.log("[ORT.JS] Matching folder name: ", folder_name, results);
+            // Now, we can delete the folder / collection
+             db.TextStore.where("folder_name")
+              .equals(folder_name)
+              .delete()
+              .then( function(){
+                console.log("[ORT.JS] Deleted the folder named:", folder_name);
+                update_folder_names();
+                update_folder_names();
+                // Hide the folder-display - it isn't showing anything
+                // useful to the user
+                let folder_display = document.getElementById("folder-display");
+                folder_display.innerHTML = "";
+                // That's all!
+              });
+          } else {
+            console.log("[ORT.JS] Error occurred when attempting to delete the folder name", folder_name, results);
+          }
+        });
+    } catch (e) {
+      console.log("[ORT.JS] Error getting the UUID for the user.");
+    }
+  }
+  
+}
+
 
 // This is an "added bonus" - it checks all elements of an array for the
 // same value - if they match, the success. If they don't, then there
 // are some issues
+// This is added to every single array as a prototype
 
 Array.prototype.allArrayValuesSame = function() {
-  for(var i = 1; i < this.length; i++) {
+  for (var i = 1; i < this.length; i++) {
     if(this[i] !== this[0]) {
       return false;
     }
   }
   return true;
-}
+};
 
 function processDate (date) {
   if (date.length !== 10) {
@@ -987,22 +1161,105 @@ function processDate (date) {
     // parse the date
     let d = new Date(date);
     // array of months
-    let month = new Array();
-    month[0] = "January";
-    month[1] = "February";
-    month[2] = "March";
-    month[3] = "April";
-    month[4] = "May";
-    month[5] = "June";
-    month[6] = "July";
-    month[7] = "August";
-    month[8] = "September";
-    month[9] = "October";
-    month[10] = "November";
-    month[11] = "December";
+    let month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     var string = "" + d.getDate() + " " + month[d.getMonth()] + " " + d.getFullYear() + "";
     console.log("[ORT.JS] Constructed Date: ", string);
     return string;
   }
+}
+
+function processAuthors (input_authors) {
+  // Format the authors correctly
+  // 1. Split the string where there is (" / ")
+  // 2. Capitalise the parts of the array that are not " / "
+  // 3. Join the whole string together again
+  // 4. reassign the authors part.
+  var split_authors = input_authors.split(" / ");
+  var authors = [];
+  for (let i = 0; i < split_authors.length; i++) {
+    if (split_authors[i] !== " / " && split_authors[i] !== "") {
+      authors.push(split_authors[i].trim());
+    }
+  }
+  
+  if (authors.length === 1) {
+    let input_authors = "" + authors[0].toUpperCase() + "";
+    return input_authors;
+  } else if (authors.length === 2) {
+    let input_authors = "" + authors[0].toUpperCase() + " and " + authors[1].toUpperCase() + "";
+    return input_authors;
+  } else if (authors.length === 3) {
+    let input_authors = "" + authors[0].toUpperCase() + ", " + authors[1].toUpperCase() + " and " + authors[2].toUpperCase() + "";
+    return input_authors;
+  } else if (authors.length > 3) {
+    let input_authors = "" + authors[0].toUpperCase() + " et al.";
+    return input_authors;
+  } else {
+    // Do nothing - as the user may have a better idea.
+    return input_authors;
+  }
+}
+
+// Appends the edition with the period needed,
+// if the edition exists.
+function processEdition (edition) {
+  if (edition !== "") {
+    return edition + ". ";
+  } else {
+    return edition;
+  }
+}
+
+// Appends ", ed." or ", eds." to the end of
+// the book editors. Needed for the conference papers and the chapters
+// in an edited book.
+
+function  processEditors(input_authors) {
+  var split_authors = input_authors.split(" / ");
+  var authors = [];
+  for (let i = 0; i < split_authors.length; i++) {
+    if (split_authors[i] !== " / " && split_authors[i] !== "") {
+      authors.push(split_authors[i]);
+    }
+  }
+  
+  if (authors.length === 1) {
+    let input_authors = "" + authors[0].toUpperCase() + ", ed. ";
+    return input_authors;
+  } else if (authors.length === 2) {
+    let input_authors = "" + authors[0].toUpperCase() + " and " + authors[1].toUpperCase() + ", eds. ";
+    return input_authors;
+  } else if (authors.length === 3) {
+    let input_authors = "" + authors[0].toUpperCase() + ", " + authors[1].toUpperCase() + " and " + authors[2].toUpperCase() + ", eds. ";
+    return input_authors;
+  } else if (authors.length > 3) {
+    let input_authors = "" + authors[0].toUpperCase() + " et al., eds. ";
+    return input_authors;
+  } else {
+    // Do nothing - as the user may have a better idea.
+    return input_authors;
+  }
+}
+
+// removes underscores from the values - makes them look pretty when
+// displaying the references
+function removeUnderscores (string) {
+  var split_string = string.split("_");
+  let returned_string = split_string.join(" ");
+  return returned_string;
+}
+
+// Register the service worker here, after this script has finished loading
+// to prevent any errors occuring.
+if ("serviceWorker" in navigator && result === "enabled" ) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("/ort_service_worker.js").then(function(registration) {
+      // Registration was successful
+      console.log("[ORT.JS] ServiceWorker registration successful with scope: ", registration.scope);
+    }, function(err) {
+      // registration failed :(
+      console.log("[ORT.JS] ServiceWorker registration failed:", err);
+    });
+  });
 }
 
