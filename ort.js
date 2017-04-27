@@ -15,17 +15,41 @@ var db = new Dexie("folder_database");
 db.version(1).stores({
   TextStore: "++id, folder_name"
 }).upgrade(function (version){
-  // Do something if the IDB needs updating.
+  // In future versions, you would need to migrate TextStore
+  // to a new store located in the next DB version
   console.log("[ORT.JS] Database is being upgraded.");
 });
 
-var result;
-db.open().catch(function (error){
-  result = "enabled";
+try {
+  db.open().then(function(){
+    // Register the service worker - 
+    // otherwise the user will be stuck with a version
+    // or ORT that does not work.
+    console.log("[ORT.JS] IndexedDB is supported. Attempting registration of Service Worker...");
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function() {
+        //   ort_service_worker.js
+        navigator.serviceWorker.register("").then(function(registration) {
+          console.log("[ORT.JS] SW Scope: ", registration.scope);
+        }, function(error) {
+          console.log("[ORT.JS] SW Registration has failed:", error);
+        });
+      });
+    }
+  }).catch(function(error){
+    console.log("[ORT.JS] Browser does not support IDB stores, or the browser is in private mode.");
+    document.body.innerHTML = "";
+    document.body.innerHTML = "<h1>Please leave Incognito mode / Private Browsing mode, as it prevents use of IndexedDB.</h1><p>Error for developers: " + error.message + "</p>";
+  });
+} catch (error) {
+  console.log("[ORT.JS] Attempted opening of the DB resulted in failure. ", error);
   document.body.innerHTML = "";
-  document.body.innerHTML = "<h1>ERROR: IndexedDB is not supported in this browser OR this browser is in Private Mode / Incognito.</h1><p>This service requires the lastest browsers to use. Please try using:</p><ul><li>Mozilla Firefox</li><li>Google Chrome</li><li>Chromium</li></ul><p>outside of Private Browsing mode.</p><p>" + error + "</p>";
-});
-console.log("[ORT.JS] Result of IDB test: ", result);
+  document.body.innerHTML = "<h1>Please leave Incognito mode / Private Browsing mode, as it prevents use of IndexedDB.</h1><p>Error for developers: " + error.message + "</p>";
+}
+
+// If the next version of the DB needs updating,
+// then not only have v1 of Dexie, but also v2 of the
+// dexie DB.
 
 window.addEventListener('load', function () {
   try {
@@ -1251,15 +1275,4 @@ function removeUnderscores (string) {
 
 // Register the service worker here, after this script has finished loading
 // to prevent any errors occuring.
-if ("serviceWorker" in navigator && result === "enabled" ) {
-  window.addEventListener("load", function() {
-    navigator.serviceWorker.register("/ort_service_worker.js").then(function(registration) {
-      // Registration was successful
-      console.log("[ORT.JS] ServiceWorker registration successful with scope: ", registration.scope);
-    }, function(err) {
-      // registration failed :(
-      console.log("[ORT.JS] ServiceWorker registration failed:", err);
-    });
-  });
-}
 
