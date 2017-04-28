@@ -4,9 +4,7 @@
 
 console.log("[ORT_SW] File loaded.");
 
-var name_of_cache = 'ORT-4';
-
-var PRECACHE_URLS = [
+var files = [
   './',
   './index.html',
   './ort.css',
@@ -15,20 +13,20 @@ var PRECACHE_URLS = [
   './ort_service_worker.js'
 ];
 
-const PRECACHE = 'ORT-3';
-const RUNTIME = 'runtime';
+const name = 'ORT-3';
+const run_time = 'runtime';
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(PRECACHE)
-      .then(cache => cache.addAll(PRECACHE_URLS))
+    caches.open(name)
+      .then(cache => cache.addAll(files))
       .then(self.skipWaiting())
   );
 });
 
 // The activate handler takes care of cleaning up old caches.
 self.addEventListener('activate', event => {
-  const currentCaches = [PRECACHE, RUNTIME];
+  const currentCaches = [name, run_time];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return cacheNames.filter(cacheName => !currentCaches.includes(cacheName));
@@ -52,7 +50,7 @@ self.addEventListener('fetch', event => {
           return cachedResponse;
         }
 
-        return caches.open(RUNTIME).then(cache => {
+        return caches.open(run_time).then(cache => {
           return fetch(event.request).then(response => {
             // Put a copy of the response in the runtime cache.
             return cache.put(event.request, response.clone()).then(() => {

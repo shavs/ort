@@ -29,7 +29,7 @@ try {
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function() {
         //   ort_service_worker.js
-        navigator.serviceWorker.register("").then(function(registration) {
+        navigator.serviceWorker.register("ort_service_worker.js").then(function(registration) {
           console.log("[ORT.JS] SW Scope: ", registration.scope);
         }, function(error) {
           console.log("[ORT.JS] SW Registration has failed:", error);
@@ -78,9 +78,12 @@ window.addEventListener('load', function () {
           console.log("[ORT.JS] There was an error during UUID testing.");
           console.log(e);
         }
-        
       }).catch(function(error){
         console.log("[ORT.JS] Error! Something went wrong during the fetch:", error);
+        // Because the initial fetch went wrong, and the User ID does not exist,
+        // prevent the user from continuing.
+        document.body.innerHTML = "";
+        document.body.innerHTML = "<h1>ERROR: It appears that the request for a User ID has failed.</h1> <p>Please try loading this page with a normal internet connection.</p>";
       });
     } else {
       console.log("[ORT.JS] Looks like the User ID has already been set.");
@@ -956,43 +959,47 @@ function export_references (folder_name)  {
         newExportCtn.style.width = "80%";
         newExportCtn.style.height = "25vh";
         newExportCtn.style.display = "block";
+
+        // References have been obtained, but it is neccessary to process
+        // any duplicates within this.
+        appendDuplicates(references);
         
         // Got the references
         for (let f = 0; f < references.length; f++) {
           
           if (references[f].type === "website") {
             
-            var string = "" + processAuthors(references[f].authors) + ", " + references[f].date_published + ". " + references[f].title + " [viewed " + processDate(references[f].date_accessed) + "]. Available from: " + references[f].url;
+            var string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].title + " [viewed " + processDate(references[f].date_accessed) + "]. Available from: " + references[f].url;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             
             // Next reference!
           } else if (references[f].type === "book") {
             
-            let string = "" + processAuthors(references[f].authors) + ", " + references[f].date_published + ". " + references[f].title + ". " + processEdition(references[f].edition) + "" + references[f].place_of_publication + ": " + references[f].publisher;
+            let string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].title + ". " + processEdition(references[f].edition) + "" + references[f].place_of_publication + ": " + references[f].publisher;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             
             // Next reference!
           } else if (references[f].type === "chapter") {
             
-            let string = "" + processAuthors(references[f].authors_of_chapter) + ", " + references[f].date_published + ". " + references[f].chapter_title + ". In: " + processEditors(references[f].authors_of_book) + "" + references[f].title + ". " + processEdition(references[f].edition) + "" + references[f].place_of_publication + ": " + references[f].publisher + ", " + references[f].pages;
+            let string = "" + references[f].authors_of_chapter + ", " + references[f].date_published + ". " + references[f].chapter_title + ". In: " + processEditors(references[f].authors_of_book) + "" + references[f].title + ". " + processEdition(references[f].edition) + "" + references[f].place_of_publication + ": " + references[f].publisher + ", " + references[f].pages;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             
             // Next Reference!
           } else if (references[f].type === "conference") {
-                                                                                                                                                                                                                        // TODO Missing whether there is an editors part or not. Just needs to count.
-            let string = "" + processAuthors(references[f].authors_of_chapter) + ", " + references[f].date_published + ". " + references[f].chapter_title + ". In: " + processEditors(references[f].authors_of_book) + "" + processEdition(references[f].edition) + "" + references[f].place_of_publication + ": " + references[f].publisher + ", " + references[f].pages;
+
+            let string = "" + references[f].authors_of_chapter + ", " + references[f].date_published + ". " + references[f].chapter_title + ". In: " + processEditors(references[f].authors_of_book) + "" + processEdition(references[f].edition) + "" + references[f].place_of_publication + ": " + references[f].publisher + ", " + references[f].pages;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             
             // Next reference!
           } else if (references[f].type === "journal") {
             
-            let string = "" + processAuthors(references[f].authors) + ", " + references[f].date_published + ". " + references[f].article_title + ". " + references[f].journal_title + ", " + references[f].volume_number + ", " + references[f].pages;
+            let string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].article_title + ". " + references[f].journal_title + ", " + references[f].volume_number + ", " + references[f].pages;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             
             // Next reference!
           } else if (references[f].type === "blog") {
             
-            let string = "" + processAuthors(references[f].authors) + ", " + references[f].date_published + ". " + references[f].title_of_entry + ". In: " + references[f].title_of_blog + ". " + processDate(references[f].date_published_full) + " [viewed " + processDate(references[f].date_accessed) + "]. Available from: " + references[f].url;
+            let string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].title_of_entry + ". In: " + references[f].title_of_blog + ". " + processDate(references[f].date_published_full) + " [viewed " + processDate(references[f].date_accessed) + "]. Available from: " + references[f].url;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             
           } else if (references[f].type === "image") {
@@ -1003,7 +1010,7 @@ function export_references (folder_name)  {
             // Date Viewed - date_accessed
             // URL - url
             
-            let string = "" + processAuthors(references[f].authors) + ", " + references[f].date_published + " [digital image] [viewed " + processDate(reference[f].date_accessed) + "]. Available from: " + references[f].url;
+            let string = "" + references[f].authors + ", " + references[f].date_published + " [digital image] [viewed " + processDate(reference[f].date_accessed) + "]. Available from: " + references[f].url;
             newExportCtn.value = newExportCtn.value + string + "\n\n";
             
             // Next reference
@@ -1192,6 +1199,8 @@ function processDate (date) {
   }
 }
 
+// This segments and rejoins the authors string into
+// a new string that can be accurately used with references
 function processAuthors (input_authors) {
   // Format the authors correctly
   // 1. Split the string where there is (" / ")
@@ -1271,6 +1280,76 @@ function removeUnderscores (string) {
   var split_string = string.split("_");
   let returned_string = split_string.join(" ");
   return returned_string;
+}
+
+function appendDuplicates (references) {
+  var original_references = references;
+  
+  const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+  
+  if (!references) {
+    console.log("[ORT.JS] Error processing the references:", references);
+  } else {
+    console.log("[ORT.JS] References have been obtained.", references);
+    
+    // First, get the references as though there have
+    // been inserted into the textarea
+    
+    for (let i = 0; i < references.length; i++) {
+      if (references[i].authors && !references[i].authors_of_chapter) {
+        let new_authors = processAuthors(references[i].authors);
+        references[i].authors = new_authors;
+      } else if (references[i].authors_of_chapter && !references[i].authors) {
+        let new_authors_of_chapter = processAuthors(references[i].authors_of_chapter);
+        references[i].authors_of_chapter = new_authors_of_chapter;
+      }
+    }
+    
+    for (var i = 0; i < references.length; i++) {
+      if (i !== 0) {
+        if (references[i].authors === references[i - 1].authors && !references[i].authors_of_chapter && !references[i - 1].authors_of_chapter || references[i].authors === references[i - 1].authors_of_chapter && !references[i].authors_of_chapter && !references[i - 1].authors || references[i].authors_of_chapter === references[i - 1].authors && references[i].authors && !references[i - 1].authors_of_chapter || references[i].authors_of_chapter === references[i - 1].authors_of_chapter && !references[i].authors && !references[i].authors) {
+          if (references[i].date_published === references[i - 1].date_published) {
+            if (!references[i - 1].suffix) {
+              references[i - 1].suffix = alphabet[0];
+              references[i].suffix = alphabet[1];
+            } else {
+              // Get the next element in the array, and use that
+              // on the current reference.
+              var letter = alphabet[alphabet.indexOf(references[i - 1].suffix) + 1];
+              if (!letter || letter === -1) {
+                console.log("[ORT.JS] Letter does not exist.", letter);
+              } else {
+                console.log("[ORT.JS] Letter exists, assigning it to a reference", letter);
+                references[i].suffix = letter;
+              }
+            }
+          }
+        } 
+      }
+    }
+
+    // Next one appends the suffix to the year
+    for (i = 0; i < references.length; i++) {
+      console.log("\n\n");
+      console.log("[CALCULATED REFERENCE]", references[i]);
+      console.log(references[i].suffix);
+      console.log(i);
+      if (!references[i].suffix) {
+        console.log("Does not have a suffix. Moving on...");
+      } else {
+        // Append the suffix to the year, and remove the
+        // suffix property from the year.
+        console.log(references[i].suffix);
+        references[i].date_published = references[i].date_published + references[i].suffix;
+        console.log("[ORT.JS] Finished appending the suffix to the year:", references[i].date_published);
+      }
+    }
+
+    // Returns the references, once they have been completed.
+    // Even if there are no duplicates, this function still processes the
+    // authors (though only for the authors section).
+    return references;
+  }
 }
 
 // Register the service worker here, after this script has finished loading
