@@ -1,6 +1,6 @@
 /*jshint esversion: 6 */
 console.log("--------------------------------------------------");
-var SERVER_URL = "https://localhost:8080/";
+var SERVER_URL = "";
 
 // Check if the browser supports IndexedDB
 // Also needed to check if IDB is available within Private Mode / Incognito
@@ -29,7 +29,7 @@ try {
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function() {
         //   ort_service_worker.js
-        navigator.serviceWorker.register("ort_service_worker.js").then(function(registration) {
+        navigator.serviceWorker.register("").then(function(registration) {
           console.log("[ORT.JS] SW Scope: ", registration.scope);
         }, function(error) {
           console.log("[ORT.JS] SW Registration has failed:", error);
@@ -55,7 +55,7 @@ window.addEventListener('load', function () {
   try {
     var user_id = localStorage.getItem("user_id");
     if (!user_id) {
-      fetch(SERVER_URL + "api/get_user_id").then(function(response){
+      fetch("api/get_user_id").then(function(response){
         console.log("[ORT.JS] Response Received, converting to JSON...");
         return response.json();
       }).then(function(data){
@@ -195,15 +195,26 @@ function display_folder_contents (folder_name) {
           createErrorPar.classList.add("error-no-references");
           folder_display.appendChild(createErrorPar);
 
+          // Create a container div for the headings, append that to the dom
+          let newHD = document.createElement("div");
+          newHD.classList.add("folder-headings");
+
           // Create the heading element with the folder title inside:
           let newFT = document.createElement("h3");
           newFT.innerText = "" + folder_name + "";
-          folder_display.appendChild(newFT);
+          newHD.appendChild(newFT);
 
           // Give a paragraph tag for some folder controls
-          let newBT = document.createElement("h4");
-          newBT.innerText = "Folder Controls";
-          folder_display.appendChild(newBT);
+          //let newBT = document.createElement("h4");
+          //newBT.innerText = "Folder Controls";
+          //newHD.appendChild(newBT);
+
+          // Append the headings to the DOM
+          folder_display.appendChild(newHD);
+
+          // Create div for the folder controls
+          let newFC = document.createElement("div");
+          newFC.classList.add("folder-controls");
           
           // Append the "create reference" button
           let newRefButton = document.createElement("button");
@@ -213,7 +224,7 @@ function display_folder_contents (folder_name) {
             // Needs the folder name
             add_reference(folder_name);
           });
-          folder_display.appendChild(newRefButton);
+          newFC.appendChild(newRefButton);
 
           // Append the "export references" button
           let newExpBtn = document.createElement("button");
@@ -223,7 +234,7 @@ function display_folder_contents (folder_name) {
             // Exports the folder - needs only the folder name
             export_references(folder_name);
           });
-          folder_display.appendChild(newExpBtn);
+          newFC.appendChild(newExpBtn);
 
           // Append the "export references" button
           let newDelBtn = document.createElement("button");
@@ -233,8 +244,9 @@ function display_folder_contents (folder_name) {
             // Exports the folder - needs only the folder name
             delete_folder(folder_name);
           });
-          folder_display.appendChild(newDelBtn);
+          newFC.appendChild(newDelBtn);
 
+          folder_display.appendChild(newFC);
           
           if (references.length === 0 || !references) {
             console.log("[ORT.JS] No references to display:", references, references.length);
@@ -474,12 +486,22 @@ document.getElementById("reference-type").addEventListener("change", function ()
       // Year Accessed
       // Month Accessed
       // Day Accessed
-      
+
+      let newP1 = document.createElement("p");
+      newP1.innerText = "Please enter the authors, by: \n separating each author with a space, followed by a forward slash, followed by a space ( / ):";
+      newP1.classList.add("ref_par");
+      reference_form.appendChild(newP1);
+
       let newAuth = document.createElement("input");
       newAuth.type = "text";
-      newAuth.placeholder = "Please enter the authors, formatted correctly";
+      newAuth.placeholder = "Please enter the authors, by separating each author with a space, followed by a forward slash, followed by a space ( / )";
       newAuth.name = "authors";
       reference_form.appendChild(newAuth);
+
+      let newP2 = document.createElement("p");
+      newP2.innerText = "Please enter a valid URL:";
+      newP2.classList.add("ref_par");
+      reference_form.appendChild(newP2);
 
       let newURL = document.createElement("input");
       newURL.type = "url";
@@ -487,16 +509,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newURL.name = "url";
       reference_form.appendChild(newURL);
 
+      let newP3 = document.createElement("p");
+      newP3.innerText = "Title of the Website:";
+      newP3.classList.add("ref_par");
+      reference_form.appendChild(newP3);
+
       let newTitle = document.createElement("input");
       newTitle.type = "text";
       newTitle.placeholder = "Title of Website";
       newTitle.name = "title";
       reference_form.appendChild(newTitle);
 
-      let newPV = document.createElement("p");
-      newPV.innerText = "Date Published";
-      newPV.classList.add("ref_par");
-      reference_form.appendChild(newPV);
+      let newP4 = document.createElement("p");
+      newP4.innerText = "Date Published (yyyy):";
+      newP4.classList.add("ref_par");
+      reference_form.appendChild(newP4);
       
       let newYP = document.createElement("input");
       newYP.type = "text";
@@ -505,11 +532,11 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newYP.placeholder = "yyyy - Date Published";
       newYP.name = "date_published";
       reference_form.appendChild(newYP);
-
-      let newPA = document.createElement("p");
-      newPA.innerText = "Date Accessed";
-      newPA.classList.add("ref_par");
-      reference_form.appendChild(newPA);
+      
+      let newP5 = document.createElement("p");
+      newP5.innerText = "Date Accessed, formatted as yyyy-mm-dd (ISO date standard):";
+      newP5.classList.add("ref_par");
+      reference_form.appendChild(newP5);
       
       let newDA = document.createElement("input");
       newDA.type = "text";
@@ -521,11 +548,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
     } else if (reference_form_type === "book") {
       console.log("[ORT.JS] Reference was a book, creating book form...");
 
+      let newP1 = document.createElement("p");
+      newP1.innerText = "Please enter the authors, by: \n separating each author with a space, followed by a forward slash, followed by a space ( / ):";
+      newP1.classList.add("ref_par");
+      reference_form.appendChild(newP1);
+
       let newAuth = document.createElement("input");
       newAuth.type = "text";
-      newAuth.placeholder = "Please enter the authors, formatted correctly";
+      newAuth.placeholder = "Please enter the authors, by separating each author with a space, followed by a forward slash, followed by a space ( / )";
       newAuth.name = "authors";
       reference_form.appendChild(newAuth);
+
+      let newP2 = document.createElement("p");
+      newP2.innerText = "Date Published (yyyy)";
+      newP2.classList.add("ref_par");
+      reference_form.appendChild(newP2);
 
       let newYP = document.createElement("input");
       newYP.type = "text";
@@ -535,11 +572,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newYP.name = "date_published";
       reference_form.appendChild(newYP);
 
+      let newP3 = document.createElement("p");
+      newP3.innerText = "Title of the Book:";
+      newP3.classList.add("ref_par");
+      reference_form.appendChild(newP3);
+
       let newTitle = document.createElement("input");
       newTitle.type = "text";
       newTitle.placeholder = "Title of Book";
       newTitle.name = "title";
       reference_form.appendChild(newTitle);
+
+      let newP4 = document.createElement("p");
+      newP4.innerText = "Edition of the Book (leave blank if not applicable):";
+      newP4.classList.add("ref_par");
+      reference_form.appendChild(newP4);
 
       let newEd = document.createElement("input");
       newEd.type = "text";
@@ -547,11 +594,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newEd.name = "edition";
       reference_form.appendChild(newEd);
 
+      let newP5 = document.createElement("p");
+      newP5.innerText = "Place of Publication:";
+      newP5.classList.add("ref_par");
+      reference_form.appendChild(newP5);
+
       let newPlace = document.createElement("input");
       newPlace.type = "text";
       newPlace.placeholder = "Place of Publication";
       newPlace.name = "place_of_publication";
       reference_form.appendChild(newPlace);
+
+      let newP6 = document.createElement("p");
+      newP6.innerText = "Publisher:";
+      newP6.classList.add("ref_par");
+      reference_form.appendChild(newP6);
 
       let newPub = document.createElement("input");
       newPub.type = "text";
@@ -571,12 +628,22 @@ document.getElementById("reference-type").addEventListener("change", function ()
       // Place of Publication
       // Publisher
       // Pages
+
+      let newP1 = document.createElement("p");
+      newP1.innerText = "Please enter the Editors / Authors of the Chapter, by: \n separating each author with a space, followed by a forward slash, followed by a space ( / ):";
+      newP1.classList.add("ref_par");
+      reference_form.appendChild(newP1);
       
       let newAuth = document.createElement("input");
       newAuth.type = "text";
-      newAuth.placeholder = "Please enter the authors, formatted correctly. Authors / Editors of the chapter";
+      newAuth.placeholder = "Please enter the Editors / Authors of the Chapter, by: separating each author with a space, followed by a forward slash, followed by a space ( / ):";
       newAuth.name = "authors_of_chapter";
       reference_form.appendChild(newAuth);
+
+      let newP2 = document.createElement("p");
+      newP2.innerText = "Date Published (yyyy):";
+      newP2.classList.add("ref_par");
+      reference_form.appendChild(newP2);
 
       let newYP = document.createElement("input");
       newYP.type = "text";
@@ -586,23 +653,43 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newYP.name = "date_published";
       reference_form.appendChild(newYP);
 
+      let newP3 = document.createElement("p");
+      newP3.innerText = "Title of Chapter/Essay:";
+      newP3.classList.add("ref_par");
+      reference_form.appendChild(newP3);
+
       let newChapTitle = document.createElement("input");
       newChapTitle.type = "text";
       newChapTitle.placeholder = "Title of Chapter/Essay";
       newChapTitle.name = "chapter_title";
       reference_form.appendChild(newChapTitle);
 
+      let newP4 = document.createElement("p");
+      newP4.innerText = "Please enter the Authors of the Book / Editors of the Book, by: \n separating each author with a space, followed by a forward slash, followed by a space ( / ):";
+      newP4.classList.add("ref_par");
+      reference_form.appendChild(newP4);
+
       let newEdBook = document.createElement("input");
       newEdBook.type = "text";
-      newEdBook.placeholder = "Authors of the book / Editors of the book";
+      newEdBook.placeholder = "Please enter the Authors of the Book / Editors of the Book, by separating each author with a space, followed by a forward slash, followed by a space ( / ):";
       newEdBook.name = "authors_of_book";
       reference_form.appendChild(newEdBook);
+
+      let newP5 = document.createElement("p");
+      newP5.innerText = "Title of the Book:";
+      newP5.classList.add("ref_par");
+      reference_form.appendChild(newP5);
 
       let newTitle = document.createElement("input");
       newTitle.type = "text";
       newTitle.placeholder = "Title of Book";
       newTitle.name = "title";
       reference_form.appendChild(newTitle);
+
+      let newP6 = document.createElement("p");
+      newP6.innerText = "Edition (leave blank if not applicable):";
+      newP6.classList.add("ref_par");
+      reference_form.appendChild(newP6);
       
       let newEd = document.createElement("input");
       newEd.type = "text";
@@ -610,11 +697,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newEd.name = "edition";
       reference_form.appendChild(newEd);
 
+      let newP7 = document.createElement("p");
+      newP7.innerText = "Place of Publication:";
+      newP7.classList.add("ref_par");
+      reference_form.appendChild(newP7);
+      
       let newPlace = document.createElement("input");
       newPlace.type = "text";
       newPlace.placeholder = "Place of Publication";
       newPlace.name = "place_of_publication";
       reference_form.appendChild(newPlace);
+
+      let newP8 = document.createElement("p");
+      newP8.innerText = "Publisher:";
+      newP8.classList.add("ref_par");
+      reference_form.appendChild(newP8);
 
       let newPub = document.createElement("input");
       newPub.type = "text";
@@ -622,14 +719,23 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newPub.name = "publisher";
       reference_form.appendChild(newPub);
 
+      let newP9 = document.createElement("p");
+      newP9.innerText = "Pages (formatted as: \"pp.n-n\", where n is a number):";
+      newP9.classList.add("ref_par");
+      reference_form.appendChild(newP9);
+
       let newPages = document.createElement("input");
       newPages.type = "text";
       newPages.placeholder = "Pages (formatted as: \"pp.n-n\", where n is a number)";
       newPages.name = "pages";
       reference_form.appendChild(newPages);
-
       
     } else if (reference_form_type === "conference") {
+
+      let newP1 = document.createElement("p");
+      newP1.innerText = "Please enter the authors, by: \n separating each author with a space, followed by a forward slash, followed by a space ( / ):";
+      newP1.classList.add("ref_par");
+      reference_form.appendChild(newP1);
     
       let newAuth = document.createElement("input");
       newAuth.type = "text";
@@ -637,6 +743,11 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newAuth.name = "authors_of_chapter";
       reference_form.appendChild(newAuth);
 
+      let newP2 = document.createElement("p");
+      newP2.innerText = "Date Published (yyyy):";
+      newP2.classList.add("ref_par");
+      reference_form.appendChild(newP2);
+
       let newYP = document.createElement("input");
       newYP.type = "text";
       newYP.maxlength = "4";
@@ -645,23 +756,43 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newYP.name = "date_published";
       reference_form.appendChild(newYP);
 
+      let newP3 = document.createElement("p");
+      newP3.innerText = "Title of Chapter / Essay:";
+      newP3.classList.add("ref_par");
+      reference_form.appendChild(newP3);
+
       let newChapTitle = document.createElement("input");
       newChapTitle.type = "text";
       newChapTitle.placeholder = "Title of Chapter/Essay";
       newChapTitle.name = "chapter_title";
       reference_form.appendChild(newChapTitle);
 
+      let newP4 = document.createElement("p");
+      newP4.innerText = "Please enter the Authors / Editors of the book, by: \n separating each author with a space, followed by a forward slash, followed by a space ( / ):";
+      newP4.classList.add("ref_par");
+      reference_form.appendChild(newP4);
+
       let newEdBook = document.createElement("input");
       newEdBook.type = "text";
-      newEdBook.placeholder = "Authors of the book / Editors of the book";
+      newEdBook.placeholder = "Please enter the Authors / Editors of the book, by separating each author with a space, followed by a forward slash, followed by a space ( / ):";
       newEdBook.name = "authors_of_book";
       reference_form.appendChild(newEdBook);
+
+      let newP5 = document.createElement("p");
+      newP5.innerText = "Title of Book:";
+      newP5.classList.add("ref_par");
+      reference_form.appendChild(newP5);
 
       let newTitle = document.createElement("input");
       newTitle.type = "text";
       newTitle.placeholder = "Title of Book";
       newTitle.name = "title";
       reference_form.appendChild(newTitle);
+
+      let newP6 = document.createElement("p");
+      newP6.innerText = "Edition (leave blank if not applicable)";
+      newP6.classList.add("ref_par");
+      reference_form.appendChild(newP6);
       
       let newEd = document.createElement("input");
       newEd.type = "text";
@@ -669,11 +800,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newEd.name = "edition";
       reference_form.appendChild(newEd);
 
+      let newP7 = document.createElement("p");
+      newP7.innerText = "Date and place of the Conference - Formatted as nn-nn MMM, YYYY \n For example: 22-23 January, 2017";
+      newP7.classList.add("ref_par");
+      reference_form.appendChild(newP7);
+
       let newDate = document.createElement("input");
       newDate.type = "text";
       newDate.placeholder = "Date and place of Conference - Formatted nn-nn MMM, YYYY.";
       newDate.name = "date_of_conference";
       reference_form.appendChild(newDate);
+
+      let newP8 = document.createElement("p");
+      newP8.innerText = "Place of Publication:";
+      newP8.classList.add("ref_par");
+      reference_form.appendChild(newP8);
 
       let newPlace = document.createElement("input");
       newPlace.type = "text";
@@ -681,11 +822,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newPlace.name = "place_of_publication";
       reference_form.appendChild(newPlace);
 
+      let newP9 = document.createElement("p");
+      newP9.innerText = "Publisher:";
+      newP9.classList.add("ref_par");
+      reference_form.appendChild(newP9);
+
       let newPub = document.createElement("input");
       newPub.type = "text";
       newPub.placeholder = "Publisher";
       newPub.name = "publisher";
       reference_form.appendChild(newPub);
+
+      let newP10 = document.createElement("p");
+      newP10.innerText = "Pages (formatted as: \"pp.n-n\", where n is a number):";
+      newP10.classList.add("ref_par");
+      reference_form.appendChild(newP10);
 
       let newPages = document.createElement("input");
       newPages.type = "text";
@@ -701,11 +852,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       // Volume and Part number
       // pages
 
+      let newP1 = document.createElement("p");
+      newP1.innerText = "Please enter the authors, by: \n separating each author with a space, followed by a forward slash, followed by a space ( / ):";
+      newP1.classList.add("ref_par");
+      reference_form.appendChild(newP1);
+
       let newAuth = document.createElement("input");
       newAuth.type = "text";
-      newAuth.placeholder = "Please enter the authors, formatted correctly. Authors / Editors of the chapter";
+      newAuth.placeholder = "Please enter the authors, by separating each author with a space, followed by a forward slash, followed by a space ( / ):";
       newAuth.name = "authors";
       reference_form.appendChild(newAuth);
+
+      let newP2 = document.createElement("p");
+      newP2.innerText = "Date Published (yyyy):";
+      newP2.classList.add("ref_par");
+      reference_form.appendChild(newP2);
 
       let newYP = document.createElement("input");
       newYP.type = "text";
@@ -715,11 +876,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newYP.name = "date_published";
       reference_form.appendChild(newYP);
 
+      let newP3 = document.createElement("p");
+      newP3.innerText = "Title of Article:";
+      newP3.classList.add("ref_par");
+      reference_form.appendChild(newP3);
+
       let newArtTitle = document.createElement("input");
       newArtTitle.type = "text";
       newArtTitle.placeholder = "Title of Article";
       newArtTitle.name = "article_title";
       reference_form.appendChild(newArtTitle);
+
+      let newP4 = document.createElement("p");
+      newP4.innerText = "Title of Journal:";
+      newP4.classList.add("ref_par");
+      reference_form.appendChild(newP4);
 
       let newTitle = document.createElement("input");
       newTitle.type = "text";
@@ -727,11 +898,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newTitle.name = "journal_title";
       reference_form.appendChild(newTitle);
 
+      let newP5 = document.createElement("p");
+      newP5.innerText = "Volume Number (issue or part number):";
+      newP5.classList.add("ref_par");
+      reference_form.appendChild(newP5);
+
       let newVolNum = document.createElement("input");
       newVolNum.type = "text";
       newVolNum.placeholder = "Volume Number (issue or part number)";
       newVolNum.name = "volume_number";
       reference_form.appendChild(newVolNum);
+
+      let newP6 = document.createElement("p");
+      newP6.innerText = "Pages (formatted as: \"pp.n-n\", where n is a number):";
+      newP6.classList.add("ref_par");
+      reference_form.appendChild(newP6);
       
       let newPages = document.createElement("input");
       newPages.type = "text";
@@ -749,11 +930,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       // Viewed date of blog entry
       // URL
 
+      let newP1 = document.createElement("p");
+      newP1.innerText = "Please enter the authors, by: \n separating each author with a space, followed by a forward slash, followed by a space ( / ):";
+      newP1.classList.add("ref_par");
+      reference_form.appendChild(newP1);
+      
       let newAuth = document.createElement("input");
       newAuth.type = "text";
-      newAuth.placeholder = "Please enter the authors, formatted correctly";
+      newAuth.placeholder = "Please enter the authors, by separating each author with a space, followed by a forward slash, followed by a space ( / )";
       newAuth.name = "authors";
       reference_form.appendChild(newAuth);
+
+      let newP2 = document.createElement("p");
+      newP2.innerText = "Title of Blog Entry:";
+      newP2.classList.add("ref_par");
+      reference_form.appendChild(newP2);
       
       let newBlogEntryTitle = document.createElement("input");
       newBlogEntryTitle.type = "text";
@@ -761,24 +952,34 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newBlogEntryTitle.name = "title_of_entry";
       reference_form.appendChild(newBlogEntryTitle);
 
+      let newP3 = document.createElement("p");
+      newP3.innerText = "Title of Blog:";
+      newP3.classList.add("ref_par");
+      reference_form.appendChild(newP3);
+
       let newBlogTitle = document.createElement("input");
       newBlogTitle.type = "text";
       newBlogTitle.placeholder = "Title of Blog";
       newBlogTitle.name = "title_of_blog";
       reference_form.appendChild(newBlogTitle);
+
+      let newP4 = document.createElement("p");
+      newP4.innerText = "Date Published (yyyy):";
+      newP4.classList.add("ref_par");
+      reference_form.appendChild(newP4);
       
       let newYP = document.createElement("input");
       newYP.type = "text";
       newYP.maxlength = "4";
       newYP.minlength = "4";
-      newYP.placeholder = "yyyy - Date Published";
+      newYP.placeholder = "Date Published (yyyy)";
       newYP.name = "date_published";
       reference_form.appendChild(newYP);
 
-      let newPA = document.createElement("p");
-      newPA.innerText = "Date Accessed";
-      newPA.classList.add("ref_par");
-      reference_form.appendChild(newPA);
+      let newP5 = document.createElement("p");
+      newP5.innerText = "Date Accessed, formatted as yyyy-mm-dd (ISO date standard):";
+      newP5.classList.add("ref_par");
+      reference_form.appendChild(newP5);
       
       let newDA = document.createElement("input");
       newDA.type = "text";
@@ -786,6 +987,11 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newDA.placeholder = "yyyy-mm-dd";
       newDA.name = "date_accessed";
       reference_form.appendChild(newDA);
+
+      let newP6 = document.createElement("p");
+      newP6.innerText = "Date blog post was published, formatted as yyyy-mm-dd (ISO date standard):";
+      newP6.classList.add("ref_par");
+      reference_form.appendChild(newP6);
 
       let newDAF = document.createElement("input");
       newDAF.type = "text";
@@ -793,13 +999,17 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newDAF.placeholder = "yyyy-mm-dd";
       newDAF.name = "date_published_full";
       reference_form.appendChild(newDAF);
+
+      let newP7 = document.createElement("p");
+      newP7.innerText = "Please enter a valid URL:";
+      newP7.classList.add("ref_par");
+      reference_form.appendChild(newP7);
       
       let newURL = document.createElement("input");
       newURL.type = "url";
       newURL.placeholder = "URL";
       newURL.name = "url";
       reference_form.appendChild(newURL);
-
     
     } else if (reference_form_type === "image") {
       // Originators / Authors - authors
@@ -807,12 +1017,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       // Title image - title 
       // Date Viewed - date_accessed
       // URL - url
+      let newP1 = document.createElement("p");
+      newP1.innerText = "Please enter the authors, by: \n separating each author with a space, followed by a forward slash, followed by a space ( / ):";
+      newP1.classList.add("ref_par");
+      reference_form.appendChild(newP1);
 
       let newAuth = document.createElement("input");
       newAuth.type = "text";
       newAuth.placeholder = "Please enter the authors, formatted correctly";
       newAuth.name = "authors";
       reference_form.appendChild(newAuth);
+
+      let newP2 = document.createElement("p");
+      newP2.innerText = "Date Published (yyyy):";
+      newP2.classList.add("ref_par");
+      reference_form.appendChild(newP2);
 
       let newYP = document.createElement("input");
       newYP.type = "text";
@@ -822,11 +1041,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newYP.name = "date_published";
       reference_form.appendChild(newYP);
 
+      let newP3 = document.createElement("p");
+      newP3.innerText = "Title of Image:";
+      newP3.classList.add("ref_par");
+      reference_form.appendChild(newP3);
+
       let newTitle = document.createElement("input");
       newTitle.type = "text";
-      newTitle.placeholder = "Title of image";
+      newTitle.placeholder = "Title of Image";
       newTitle.name = "title";
       reference_form.appendChild(newTitle);
+
+      let newP4 = document.createElement("p");
+      newP4.innerText = "Date Accessed, formatted as yyyy-mm-dd (ISO date standard):";
+      newP4.classList.add("ref_par");
+      reference_form.appendChild(newP4);
 
       let newDA = document.createElement("input");
       newDA.type = "text";
@@ -834,6 +1063,11 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newDA.placeholder = "yyyy-mm-dd";
       newDA.name = "date_accessed";
       reference_form.appendChild(newDA);
+
+      let newP5 = document.createElement("p");
+      newP5.innerText = "Please enter a valid URL:";
+      newP5.classList.add("ref_par");
+      reference_form.appendChild(newP5);
 
       let newURL = document.createElement("input");
       newURL.type = "url";
@@ -847,11 +1081,22 @@ document.getElementById("reference-type").addEventListener("change", function ()
       // Material designation (already filled in with [film])
       // Subsidiary Originator - originator
       // Production Details
+
+      let newP1 = document.createElement("p");
+      newP1.innerText = "Title of film or video:";
+      newP1.classList.add("ref_par");
+      reference_form.appendChild(newP1);
+      
       let newTitle = document.createElement("input");
       newTitle.type = "text";
       newTitle.placeholder = "Title of film or video";
       newTitle.name = "title";
       reference_form.appendChild(newTitle);
+
+      let newP2 = document.createElement("p");
+      newP2.innerText = "Date Published (yyyy):";
+      newP2.classList.add("ref_par");
+      reference_form.appendChild(newP2);
 
       let newYP = document.createElement("input");
       newYP.type = "text";
@@ -861,6 +1106,11 @@ document.getElementById("reference-type").addEventListener("change", function ()
       newYP.name = "date_published";
       reference_form.appendChild(newYP);
 
+      let newP3 = document.createElement("p");
+      newP3.innerText = "Material Designation (for a film, enter: [film] ):";
+      newP3.classList.add("ref_par");
+      reference_form.appendChild(newP3);
+
       let mat_des = document.createElement("input");
       mat_des.type = "text";
       mat_des.placeholder = "Material Designation (for a film, enter [film] ).";
@@ -868,11 +1118,21 @@ document.getElementById("reference-type").addEventListener("change", function ()
       mat_des.name = "material_designation";
       reference_form.appendChild(mat_des);
 
+      let newP4 = document.createElement("p");
+      newP4.innerText = "Subsidiary Originator:";
+      newP4.classList.add("ref_par");
+      reference_form.appendChild(newP4);
+
       let newSubO = document.createElement("input");
       newSubO.type = "text";
       newSubO.name = "subsidiary_originator";
       newSubO.placeholder = "Subsidiary originator";
       reference_form.appendChild(newSubO);
+
+      let newP5 = document.createElement("p");
+      newP5.innerText = "Production Details:";
+      newP5.classList.add("ref_par");
+      reference_form.appendChild(newP5);
 
       let newProdDetails = document.createElement("input");
       newProdDetails.type = "text";
@@ -881,8 +1141,163 @@ document.getElementById("reference-type").addEventListener("change", function ()
       reference_form.appendChild(newProdDetails);
       
     } else if (reference_form_type === "newspaper_magazine") {
+      // Authors
+      // Year Published
+      // Title of Article
+      // Title of Newspaper / magazine
+      // day and month published
+      // pages 
+
+      let newP1 = document.createElement("p");
+      newP1.innerText = "Please enter the authors, by: \n separating each author with a space, followed by a forward slash, followed by a space ( / ):";
+      newP1.classList.add("ref_par");
+      reference_form.appendChild(newP1);
+
+      let newAuth = document.createElement("input");
+      newAuth.type = "text";
+      newAuth.placeholder = "Please enter the authors, formatted correctly";
+      newAuth.name = "authors";
+      reference_form.appendChild(newAuth);
+
+      let newP2 = document.createElement("p");
+      newP2.innerText = "Date Published (yyyy):";
+      newP2.classList.add("ref_par");
+      reference_form.appendChild(newP2);
+
+      let newYP = document.createElement("input");
+      newYP.type = "text";
+      newYP.maxlength = "4";
+      newYP.minlength = "4";
+      newYP.placeholder = "yyyy - Date Published";
+      newYP.name = "date_published";
+      reference_form.appendChild(newYP);
+
+      let newP3 = document.createElement("p");
+      newP3.innerText = "Title of Article:";
+      newP3.classList.add("ref_par");
+      reference_form.appendChild(newP3);
+
+      let newTA = document.createElement("input");
+      newTA.type = "text";
+      newTA.placeholder = "Title of Article";
+      newTA.name = "title_of_article";
+      reference_form.appendChild(newTA);
+
+      let newP4 = document.createElement("p");
+      newP4.innerText = "Title of Newspaper / Magazine:";
+      newP4.classList.add("ref_par");
+      reference_form.appendChild(newP4);
+
+      let newTNM = document.createElement("input");
+      newTNM.type = "text";
+      newTNM.placeholder = "Title of Newspaper / Magazine";
+      newTNM.name = "title_of_newspaper";
+      reference_form.appendChild(newTNM);
+
+      let newP5 = document.createElement("p");
+      newP5.innerText = "Day and Month Published (formatted as dd MMMM, e.g. 7 June):";
+      newP5.classList.add("ref_par");
+      reference_form.appendChild(newP5);
+
+      let newDMP = document.createElement("input");
+      newDMP.type = "text";
+      newDMP.placeholder = "Day and Month Published (formatted as dd MMMM, e.g. 7 June):";
+      newDMP.name = "day_and_month_published";
+      reference_form.appendChild(newDMP);
+
+      let newP6 = document.createElement("p");
+      newP6.innerText = "Pages (formatted as: \"n-n\", where n is a number. Example: 1-2): ";
+      newP6.classList.add("ref_par");
+      reference_form.appendChild(newP6);
+
+      let newPages = document.createElement("input");
+      newPages.type = "text";
+      newPages.placeholder = "Pages (formatted as: \"n-n\", where n is a number. Example: 1-2): ";
+      newPages.name = "pages";
+      reference_form.appendChild(newPages);
+
       
     } else if (reference_form_type === "online_report") {
+
+      let newP1 = document.createElement("p");
+      newP1.innerText = "Please enter the authors, by: \n separating each author with a space, followed by a forward slash, followed by a space ( / ):";
+      newP1.classList.add("ref_par");
+      reference_form.appendChild(newP1);
+      
+      let newAuth = document.createElement("input");
+      newAuth.type = "text";
+      newAuth.placeholder = "Please enter the authors, by separating each author with a space, followed by a forward slash, followed by a space ( / )";
+      newAuth.name = "authors";
+      reference_form.appendChild(newAuth);
+
+      let newP2 = document.createElement("p");
+      newP2.innerText = "Please enter a valid URL:";
+      newP2.classList.add("ref_par");
+      reference_form.appendChild(newP2);
+      let newURL = document.createElement("input");
+      newURL.type = "url";
+      newURL.placeholder = "URL";
+      newURL.name = "url";
+      reference_form.appendChild(newURL);
+
+      let newP3 = document.createElement("p");
+      newP3.innerText = "Title:";
+      newP3.classList.add("ref_par");
+      reference_form.appendChild(newP3);
+
+      let newTitle = document.createElement("input");
+      newTitle.type = "text";
+      newTitle.placeholder = "Title";
+      newTitle.name = "title";
+      reference_form.appendChild(newTitle);
+
+      let newP4 = document.createElement("p");
+      newP4.innerText = "Place of Publication:";
+      newP4.classList.add("ref_par");
+      reference_form.appendChild(newP4);
+
+      let newPlace = document.createElement("input");
+      newPlace.type = "text";
+      newPlace.placeholder = "Place of Publication";
+      newPlace.name = "place_of_publication";
+      reference_form.appendChild(newPlace);
+
+      let newP5 = document.createElement("p");
+      newP5.innerText = "Publisher:";
+      newP5.classList.add("ref_par");
+      reference_form.appendChild(newP5);
+
+      let newPub = document.createElement("input");
+      newPub.type = "text";
+      newPub.placeholder = "Publisher";
+      newPub.name = "publisher";
+      reference_form.appendChild(newPub);
+
+      let newP6 = document.createElement("p");
+      newP6.innerText = "Date Published (yyyy):";
+      newP6.classList.add("ref_par");
+      reference_form.appendChild(newP6);
+      
+      let newYP = document.createElement("input");
+      newYP.type = "text";
+      newYP.maxlength = "4";
+      newYP.minlength = "4";
+      newYP.placeholder = "yyyy - Date Published";
+      newYP.name = "date_published";
+      reference_form.appendChild(newYP);
+      
+      let newP7 = document.createElement("p");
+      newP7.innerText = "Date Accessed, formatted as yyyy-mm-dd (ISO date standard):";
+      newP7.classList.add("ref_par");
+      reference_form.appendChild(newP7);
+      
+      let newDA = document.createElement("input");
+      newDA.type = "text";
+      newDA.maxlength = "10";
+      newDA.placeholder = "yyyy-mm-dd";
+      newDA.name = "date_accessed";
+      reference_form.appendChild(newDA);
+
       
     } else if (reference_form_type === "tv") {
       console.log("[ORT.JS] Reference was a TV Broadcast. Creating TV Broadcast form.");
@@ -890,23 +1305,77 @@ document.getElementById("reference-type").addEventListener("change", function ()
       // Date
       // Time
       // Channel
-      
-      
-      
-    } else if (reference_form_type === "manual") {
-      // Manual
 
-      let newP = document.createElement("p");
-      newP.innerText = "The input needs to be in a JSON format, with key-value input.";
-      newP.classList.add("ref_par");
-      reference_form.appendChild(newP);
+      let newP1 = document.createElement("p");
+      newP1.innerText = "Title of the programme:";
+      newP1.classList.add("ref_par");
+      reference_form.appendChild(newP1);
       
-      let newInp = document.createElement("input");
-      newInp.type = "text";
-      newInp.placeholder = "Please enter the reference manually.";
-      newInp.name = "manual";
-      reference_form.appendChild(newInp);
+      let newTitle = document.createElement("input");
+      newTitle.type = "text";
+      newTitle.placeholder = "Title of the programme";
+      newTitle.name = "title";
+      reference_form.appendChild(newTitle);
+
+      let newP2 = document.createElement("p");
+      newP2.innerText = "Date Published (yyyy):";
+      newP2.classList.add("ref_par");
+      reference_form.appendChild(newP2);
       
+      let newDate = document.createElement("input");
+      newDate.type = "text";
+      newDate.placeholder = "Date Published (yyyy)";
+      newDate.name = "date_published";
+      reference_form.appendChild(newDate);
+
+      let newP3 = document.createElement("p");
+      newP3.innerText = "Material Designation (for TV, it is [TV], or for radio, it is [radio] ):";
+      newP3.classList.add("ref_par");
+      reference_form.appendChild(newP3);
+      
+      let newMD = document.createElement("input");
+      newMD.type = "text";
+      newMD.placeholder = "Material Designation (for TV, it is [TV], or for radio, it is [radio] )";
+      newMD.name = "material_designation";
+      newMD.value = "[TV]";
+      reference_form.appendChild(newMD);
+
+      let newP4 = document.createElement("p");
+      newP4.innerText = "Channel:";
+      newP4.classList.add("ref_par");
+      reference_form.appendChild(newP4);
+      
+      let newC = document.createElement("input");
+      newC.type = "text";
+      newC.placeholder = "Channel";
+      newC.name = "channel";
+      reference_form.appendChild(newC);
+
+      let newP6 = document.createElement("p");
+      newP6.innerText = "Day and Month Published (formatted as dd MMMM, e.g. 7 June) ";
+      newP6.classList.add("ref_par");
+      reference_form.appendChild(newP6);
+      
+      let newDMP = document.createElement("input");
+      newDMP.type = "text";
+      newDMP.placeholder = "Day and Month Published (formatted as dd MMMM, e.g. 7 June):";
+      newDMP.name = "day_and_month_published";
+      reference_form.appendChild(newDMP);
+      
+      let newP7 = document.createElement("p");
+      newP7.innerText = "Time of Broadcast (formatted in 24 hours. Example: 18:00)";
+      newP7.classList.add("ref_par");
+      reference_form.appendChild(newP7);
+      
+      let newTB = document.createElement("input");
+      newTB.type = "text";
+      newTB.placeholder = "Time of Broadcast (formatted in 24 hours. Example: 18:00)";
+      newTB.name = "time";
+      reference_form.appendChild(newTB);
+
+    } else if (reference_form_type === "manual") {
+      // Manual - Being removed from the code, as it should not be
+      // needed anymore.
     } else {
       console.log("[ORT.JS] Reference type has not been encountered before:", reference_form_type);
     }
@@ -1021,18 +1490,22 @@ function export_references (folder_name)  {
             
             // Next reference
           } else if (references[f].type === "newspaper_magazine") {
-          
-          
+            
+            let string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].title_of_article + ". " + references[f].title_of_newspaper + ", " + references[f].day_and_month_published + ", " + references[f].pages;
+            newExportCtn.value = newExportCtn.value + string + "\n\n";
+            
             // Next reference
           } else if (references[f].type === "online_report") {
             
-            
+            let string = "" + references[f].authors + ", " + references[f].date_published + ". " + references[f].title + ". " + references[f].place_of_publication + ": " + references[f].publisher + " [viewed " + processDate(date_accessed) + "]. Available from: " + references[f].url;
+            newExportCtn.value = newExportCtn.value + string + "\n\n";
             
             // Next reference
           } else if (references[f].type === "tv") {
 
+            let string = "" + references[f].title + ", " + references[f].date_published + " " + references[f].material_designation + ". " + references[f].channel + ", " + references[f].day_and_month_published + ", " + references[f].time + "";
+            newExportCtn.value = newExportCtn.value + string + "\n\n";
 
-            
             // Next Reference!
           } else {
             console.log("[ORT.JS] Reference type has never been encountered before.");

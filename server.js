@@ -12,15 +12,17 @@ var util = require("util");
 var url = require("url");
 var path = require("path");
 
-// Node.JS driver for Mongo - there are many different types of driver,
-// depending on the language
-// (e.g. C#, C, ...)
-
 // IP Address, Port Number and URL for the Server
 // These can be changed to fit the environment
-var IP_ADDR = '127.0.0.1',
+
+//var IP_ADDR = '127.0.0.1',
+    //PORT = '8080',
+    //URL_ADDR = 'https://localhost';
+
+// This is an alternative IP address to host the server on
+var IP_ADDR = '192.168.0.44',
     PORT = '8080',
-    URL_ADDR = 'https://localhost';
+    URL_ADDR = "https://192.168.0.44";
 
 // Parsing the security keys needed for Node JS
 var privateKey = fs.readFileSync("key.pem").toString();
@@ -102,7 +104,6 @@ var Server = https.createServer(options, function (request , response) {
         response.writeHeader(404, {"Content-Type" : "text/plain"});
         response.end("" + 404 + "");
       }
-      
     });
   } else {
     console.log("[MAIN] It's a request we aren't looking for - let it pass through.");

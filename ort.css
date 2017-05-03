@@ -67,8 +67,6 @@ header {
   justify-content: space-around;
   align-items: center;
   align-content: stretch;
-  
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
 header > h1 {
@@ -113,7 +111,7 @@ header > h1 {
 
 /* Main body of document */
 .folder-view {
-  background: grey;
+  background: white;
   display: flex;
   margin: 1rem;
 }
@@ -213,7 +211,7 @@ table > tr > * {
 
 .reference > h4 {
   display: block;
-  width: 50%;
+  width: 80%;
   padding: 0.5rem 0.5rem 0.5rem 0.5rem;
   margin: 0.5rem 0.5rem 0.5rem 0.5rem;
 }
@@ -223,4 +221,130 @@ table > tr > * {
   margin: 0.5rem 0px 0.25rem 0.5rem;
   padding: 0.5rem 0.5rem 0.5rem 0.5rem;
   margin: 0.5rem 0.5rem 0.5rem 0.5rem;
+}
+
+.ref_par {
+  clear: both;
+  display: block;
+  width: 90%;
+  margin: 1rem auto;
+}
+
+#folder-create-reference-dialog > select {
+  width: 40%;
+  margin: 0px auto;
+  display: inline-block;
+  float: left;
+}
+
+#folder-create-reference-dialog > button {
+  width: 40%;
+  margin: 0px auto;
+  display: inline-block;
+  float: right;
+}
+
+
+/*
+Breakpoints for each device scale 
+*/
+
+/*
+xsmall
+*/
+@media screen and (max-width: 25em){
+  header {
+  
+  }
+
+  .reference-buttons {
+    flex-direction: column;
+  }
+
+  .reference-button {
+    margin: 0px;
+  }
+  
+}
+
+/*
+small
+*/
+@media screen and (max-width: 39.9375em) {
+  header {
+    flex-direction: column;
+  }
+
+  .reference-buttons {
+    display: flex;
+  }
+
+  .folder-view {
+    display: block;
+  }
+
+  .folder-names {
+    min-height: 0px;
+    margin: 0rem 0rem 1rem 0rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  }
+
+  .folder-references {
+    
+  }
+
+  .reference {
+    width: auto;
+  }
+
+  .reference > table {
+    width: 99%;
+  }
+
+  .folder-controls > button {
+    display: block;
+    width: 90%;
+    margin: 1rem auto;
+  }
+
+  .folder-headings {
+    display: block;
+    width: 90%;
+    margin: 1rem auto;
+  }
+
+  .ref_par {
+    text-align: center;
+  }
+}
+
+/*
+medium and above
+*/
+@media screen and (min-width: 40em) {
+  
+}
+
+/*
+medium only
+*/
+@media screen and (min-width: 40em) and (max-width: 63.9375em) {
+  .reference {
+    width: 90%;
+  }
+}
+
+/*
+large and above
+*/
+
+@media screen and (min-width: 64em) {
+  
+}
+
+/*
+Large only
+*/
+@media screen and (min-width: 64em) and (max-width: 74.9375em){
+  
 }
