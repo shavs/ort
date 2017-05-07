@@ -50,7 +50,7 @@ var Server = https.createServer(options, function (request , response) {
   // Parse the URL for the right path
   var url_data = url.parse(request.url, true);
 
-  console.log("[MAIN] URL Requested: ", url_data);
+  //console.log("[MAIN] URL Requested: ", url_data);
 
   if (url_data.pathname === '/api/get_references') {
     console.log('[MAIN] Get References requested: ', url_data.pathname);

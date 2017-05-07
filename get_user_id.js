@@ -17,8 +17,10 @@ var uuidV4 = require('uuid/v4');
 
 // Function to get the user ID
 function get_user_id (request, response) {
+
   if (request.method === "GET") {
     console.log("  [GET_USER_ID] Right Method of request:", request.method);
+
     // 1. Create the UUID
     // 2. Add the UUID to a dedicated collection of user_ids
     // 3. Return the UUID to the client, in the form of a JSON object
