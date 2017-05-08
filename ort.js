@@ -139,10 +139,10 @@ function update_folder_names () {
         console.log("[ORT.JS] New element being inserted into the DOM:", newLi);
 
         // Give the element an event listener
-        newLi.addEventListener("click", function () {
+        newLi.addEventListener("click", (function (innerText) {
           // Trigger a separate function that displays the folder's contents
           display_folder_contents(newLi.innerText);
-        });
+        }).bind(this,newLi.innerText));
 
         // Insert the element into the DOM
         folder_names_list.insertBefore(newLi, folder_create_button);
