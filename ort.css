@@ -157,7 +157,7 @@ header > h1 {
 }
 
 #folder-display {
-
+  padding: 1rem;
 }
 
 #folder-display > button {
@@ -245,6 +245,34 @@ table > tr > * {
   float: right;
 }
 
+#folder-create-folder-dialog > h2 {
+  display: block;
+  margin: 1rem;
+}
+
+#folder-create-folder-dialog > input {
+  display: block;
+  width: 70%;
+  margin: 0px auto;
+}
+
+#folder-create-folder-dialog > select {
+  display: block;
+  width: 70%;
+  margin: 0px auto;
+}
+
+#folder-create-folder-dialog > button {
+  display: block;
+  width: 70%;
+  margin: 0px auto;
+}
+
+#folder-create-reference-dialog {
+  padding: 1rem;
+} 
+
+
 
 /*
 Breakpoints for each device scale 
@@ -316,6 +344,30 @@ small
 
   .ref_par {
     text-align: center;
+  }
+
+  #folder-create-folder-dialog > h2 {
+  display: block;
+  margin: 1rem;
+}
+
+  #folder-create-folder-dialog > input {
+    display: block;
+    width: 90%;
+    margin: 0px auto;
+  }
+  
+  #folder-create-folder-dialog > select {
+    display: block;
+    width: 90%;
+    margin: 0px auto;
+  
+  }
+  
+  #folder-create-folder-dialog > button {
+    display: block;
+    width: 90%;
+    margin: 0px auto;
   }
 }
 
