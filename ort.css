@@ -10,7 +10,7 @@ html {
 }
 
 body {
-  min-height: 100vh;
+  height: 100vh;
   max-width: 100vw;
   background: white;
   position: relative;
@@ -319,7 +319,7 @@ small
   }
 
   .folder-references {
-    
+    height: 50vh;
   }
 
   .reference {
@@ -389,6 +389,8 @@ medium only
 
 /*
 large and above
+*/
+*/
 */
 
 @media screen and (min-width: 64em) {
