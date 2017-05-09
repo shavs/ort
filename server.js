@@ -15,14 +15,14 @@ var path = require("path");
 // IP Address, Port Number and URL for the Server
 // These can be changed to fit the environment
 
-var IP_ADDR = '127.0.0.1',
-    PORT = '8080',
-    URL_ADDR = 'https://localhost';
+//var IP_ADDR = '127.0.0.1',
+//    PORT = '8080',
+//    URL_ADDR = 'https://localhost';
 
 // This is an alternative IP address to host the server on
-//var IP_ADDR = '192.168.0.44',
-//    PORT = '8080',
-//    URL_ADDR = "https://192.168.0.44";
+var IP_ADDR = '192.168.0.44',
+    PORT = '8080',
+    URL_ADDR = "https://192.168.0.44";
 
 // Parsing the security keys needed for Node JS
 var privateKey = fs.readFileSync("key.pem").toString();
