@@ -31,7 +31,7 @@ try {
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
         //   ort_service_worker.js
-        navigator.serviceWorker.register("").then(function (registration) {
+        navigator.serviceWorker.register("ort_service_worker.js").then(function (registration) {
           console.log("[ORT.JS] SW Scope: ", registration.scope);
         }, function (error) {
           console.log("[ORT.JS] SW Registration has failed:", error);
