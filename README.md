@@ -32,4 +32,25 @@ You need to:
       generate self-signed certificates using [simplehttp2server](https://github.com/GoogleChrome/simplehttp2server/releases).
       On the first run of the program, it will generate two files: `key.pem` and `cert.pem`. These files are already preconfigured for use with the Offline Referencing Tool.
   - You may need to change the IP_ADDR, PORT and URL_ADDR for the hosting environment of your choice.
-  
+    
+  - In order to run the server, type: `node server.js`. This will start the server, 
+    and the website can be browsed from there.
+
+## File Structure
+As there is little to no file structure, the files belong to each component:
+- Server
+  - get_user_id.js, used when the user first browses the site
+  - delete_folder.js, used to delete the folder from the server side and to
+    return a HTTP status code
+  - get_references.js, used to return the folder from the server side.
+  - index.html, which is returned to the user if they request the root "/" or "index.html" from server.js, and contains the core framework for the application
+  - test_web_services.html, a rudimentary page that offers a small testing platform. Separate code may be needed in order to test the web services.
+  - server.js, the main server-side script that runs the offline referencing tool, and processess any requests that are made from the client-side to the server-side
+
+- Client
+  - dexie.js, used for IndexedDB manipulation
+  - ort.css, for the basic style of the site
+  - ort.js, the compiled version of ort_es6.js
+  - ort_es6.js, which handles the client-side functionality, including registering the Service Worker, handling IndexedDB, and other duties
+  - ort_service_worker.js, this is the Service Worker which is registered if the user has a supported browser
+
